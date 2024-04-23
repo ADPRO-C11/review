@@ -113,9 +113,6 @@ jobs:
 
       - name: update permission ssh key
         run: chmod 400 ssh-key.pem
-      
-      - name: update permission user
-        run: chown -R ${{ secrets.GCP_USERNAME }}:${{ secrets.GCP_USERNAME }} /home/${{ secrets.GCP_USERNAME }}/.ssh
 
       - name: Deploy to GCP
         run: |
