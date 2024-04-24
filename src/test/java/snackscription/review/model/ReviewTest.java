@@ -10,16 +10,11 @@ public class ReviewTest {
 
     @BeforeEach
     void setUp() {
-        this.review = new Review(
-                5,
-                "Bagus bgt dah",
-                "1",
-                "111"
-        );
+        this.review = new Review(5, "Great product!", "user1",  "subsbox1");
     }
 
     @Test
-    void testCreateReview() {
+    void testConstructor() {
         int rating = 3;
         String content = "Wow!";
         String userId = "33";
