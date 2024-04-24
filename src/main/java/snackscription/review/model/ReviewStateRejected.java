@@ -1,10 +1,8 @@
 package snackscription.review.model;
 
 public class ReviewStateRejected extends ReviewState {
-
     ReviewStateRejected(Review review) {
         super(review);
-        this.name = "Rejected";
     }
 
     @Override
@@ -15,5 +13,10 @@ public class ReviewStateRejected extends ReviewState {
     @Override
     public void reject() {
         throw new RuntimeException("Review already rejected.");
+    }
+
+    @Override
+    public String toString() {
+        return "Rejected";
     }
 }

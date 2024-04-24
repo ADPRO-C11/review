@@ -4,7 +4,6 @@ public class ReviewStateApproved extends ReviewState {
 
     ReviewStateApproved(Review review) {
         super(review);
-        this.name = "Approved";
     }
 
     @Override
@@ -15,5 +14,10 @@ public class ReviewStateApproved extends ReviewState {
     @Override
     public void reject() {
         this.review.setState(new ReviewStateRejected(this.review));
+    }
+
+    @Override
+    public String toString() {
+        return "Approved";
     }
 }
