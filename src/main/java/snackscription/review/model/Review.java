@@ -21,6 +21,7 @@ public class Review {
     @Column(name = "content", nullable = false)
     private String content;
 
+//    @Transient
     @Setter
     @ManyToOne
     @JoinColumn(name = "state_id", nullable = false)

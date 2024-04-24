@@ -21,6 +21,10 @@ public abstract class ReviewState {
         this.review = review;
     }
 
+    public ReviewState() {
+
+    }
+
     public abstract void  approve();
 
     public abstract void reject();
