@@ -45,21 +45,15 @@ jobs:
         with:
           name: java-app
           path: build/libs/*.jar             
+      
+      - name: Create PostgreSQL database
+        run: | 
+          psql -U postgres -c "CREATE DATABASE snackscription_review;"
 
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: build
-    services: 
-      postgres_db:
-        image: postgres
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: snackscription_review
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    needs: build   
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
