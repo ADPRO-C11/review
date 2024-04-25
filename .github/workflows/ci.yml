@@ -45,6 +45,15 @@ jobs:
         with:
           name: java-app
           path: build/libs/*.jar
+      
+      - name: connect to postgresql database
+        uses: docker://postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        with:
+          args: -p 5432:5432
 
   test:
     name: Test
