@@ -4,6 +4,7 @@ public class ReviewStatePending extends ReviewState {
 
     ReviewStatePending(Review review) {
         super(review);
+        this.name = "Pending";
     }
 
     @Override
@@ -14,10 +15,5 @@ public class ReviewStatePending extends ReviewState {
     @Override
     public void reject() {
         this.review.setState(new ReviewStateRejected(this.review));
-    }
-
-    @Override
-    public String toString() {
-        return "Pending";
     }
 }

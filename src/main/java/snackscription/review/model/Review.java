@@ -4,17 +4,37 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.UUID;
+import jakarta.persistence.*;
+
 
 @Getter
+@Entity
+@Table(name = "review")
 public class Review {
-    private final String id;
+    @Id
+    private String id;
+
+    @Column(name = "rating", nullable = false)
     private int rating;
+
     @Setter
+    @Column(name = "content", nullable = false)
     private String content;
+
+//    @Transient
     @Setter
+    @ManyToOne
+    @JoinColumn(name = "state_id", nullable = false)
     private ReviewState state;
-    private final String userId;
-    private final String subscriptionBoxId;
+
+    @Column(name="user_id", nullable = false)
+    private String userId;
+
+    @Column(name="subsbox_id", nullable = false)
+    private String subscriptionBoxId;
+
+    public Review() {
+    }
 
     public Review(int rating, String content, String userId, String subscriptionBoxId) {
         this.id = UUID.randomUUID().toString();
@@ -24,6 +44,7 @@ public class Review {
         this.userId = userId;
         this.subscriptionBoxId = subscriptionBoxId;
     }
+
 
     public void editReview(int rating, String content) {
         this.setRating(rating);
