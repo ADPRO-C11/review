@@ -53,7 +53,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
         with:
-          args: -p 5432:5432
+          args: -p 5432:5432/tcp          
 
   test:
     name: Test
