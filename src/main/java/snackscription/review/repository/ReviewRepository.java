@@ -9,4 +9,5 @@ import snackscription.review.model.Review;
 public interface ReviewRepository extends JpaRepository<Review, String> {
     List<Review> findBySubscriptionBoxId(String subsboxId);
     Review findBySubscriptionBoxIdAndUserId(String subsboxId, String userId);
+    void deleteBySubscriptionBoxIdAndUserId(String subsboxId, String userId);
 }
