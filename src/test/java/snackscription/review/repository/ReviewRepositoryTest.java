@@ -19,28 +19,42 @@ import snackscription.review.model.Review;
 public class ReviewRepositoryTest {
     @Autowired
     private ReviewRepository reviewRepository;
+    List<Review> reviews;
+
+    @BeforeEach
+    public void setUp() {
+        this.reviews = new ArrayList<>();
+        reviews.add(new Review(5, "Bagus banget", "user_123", "subsbox_123"));
+        reviews.add(new Review(1, "Jelek banget", "user_124", "subsbox_123"));
+        reviews.add(new Review(2, "Lorem Ipsum", "user_124", "subsbox_124"));
+
+        reviewRepository.saveAll(reviews);
+    }
 
     @Test
     public void testFindBySubscriptionBoxId() {
-        List<Review> reviews = new ArrayList<>();
-        reviews.add(new Review(5, "Bagus banget", "user_123", "subsbox_123"));
-        reviews.add(new Review(1, "Jelek banget", "user_124", "subsbox_123"));
+        List<Review> curReviews = new ArrayList<>();
 
-        reviewRepository.saveAll(reviews);
+        String subsbox_id = this.reviews.getFirst().getSubscriptionBoxId();
+        for (Review review : this.reviews) {
+            if (review.getSubscriptionBoxId().equals(subsbox_id)) {
+                curReviews.add(review);
+            }
+        }
 
-        List <Review> foundReviews = reviewRepository.findBySubscriptionBoxId("subsbox_123");
+        List <Review> foundReviews = reviewRepository.findBySubscriptionBoxId(subsbox_id);
 
-        assertEquals(reviews.size(), foundReviews.size());
-        for (int i=0; i<reviews.size(); i++) {
-            assertEqualReview(reviews.get(i), foundReviews.get(i));
+        assertEquals(curReviews.size(), foundReviews.size());
+        for (int i=0; i<curReviews.size(); i++) {
+            assertEqualReview(curReviews.get(i), foundReviews.get(i));
         }
     }
 
     @Test
     public void testFindBySubscriptionBoxIdAndUserId() {
-        Review review = new Review(5, "amazing", "user1", "subsboxId");
-        reviewRepository.save(review);
-        Review foundReview = reviewRepository.findBySubscriptionBoxIdAndUserId("subsboxId", "user1");
+        Review review = this.reviews.getFirst();
+
+        Review foundReview = reviewRepository.findBySubscriptionBoxIdAndUserId(review.getSubscriptionBoxId(), review.getUserId());
         assertEqualReview(review, foundReview);
     }
 
