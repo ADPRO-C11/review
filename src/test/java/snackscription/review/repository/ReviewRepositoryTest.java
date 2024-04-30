@@ -2,6 +2,7 @@ package snackscription.review.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import snackscription.review.model.Review;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -56,6 +56,16 @@ public class ReviewRepositoryTest {
 
         Review foundReview = reviewRepository.findBySubscriptionBoxIdAndUserId(review.getSubscriptionBoxId(), review.getUserId());
         assertEqualReview(review, foundReview);
+    }
+
+    @Test
+    public void testDeleteBySubscriptionBoxIdAndUserId() {
+        Review review = this.reviews.getFirst();
+
+        reviewRepository.deleteBySubscriptionBoxIdAndUserId(review.getSubscriptionBoxId(), review.getUserId());
+        Review foundReview = reviewRepository.findBySubscriptionBoxIdAndUserId(review.getSubscriptionBoxId(), review.getUserId());
+
+        assertNull(foundReview);
     }
 
     public void assertEqualReview(Review review1, Review review2) {
