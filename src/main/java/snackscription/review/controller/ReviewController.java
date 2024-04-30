@@ -1,6 +1,7 @@
 package snackscription.review.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -38,5 +39,11 @@ public class ReviewController {
     @GetMapping("/api/reviews/{reviewId}")
     public Review getById(@PathVariable String reviewId) throws Exception {
         return reviewService.findById(reviewId); 
-    }   
+    }
+
+    @GetMapping("/api/subscription-boxes/{subscriptionBoxId}")
+    public List<Review> getBySubscriptionBoxId(@PathVariable String subscriptionBoxId) throws Exception {
+        return reviewService.findBySubscriptionBoxId(subscriptionBoxId);
+    }
+
 }
