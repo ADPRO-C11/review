@@ -3,10 +3,12 @@ package snackscription.review.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
 import snackscription.review.exception.ReviewNotFoundException;
 import snackscription.review.model.Review;
 import snackscription.review.repository.ReviewRepository;
 
+@Service
 public class ReviewService {
     private ReviewRepository reviewRepository;
 

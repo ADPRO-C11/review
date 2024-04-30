@@ -1,36 +1,65 @@
 package snackscription.review.model;
 
-import jakarta.persistence.*;
+public enum ReviewState {
+    PENDING("Pending", new PendingState()),
+    APPROVED("Approved", new ApprovedState()),
+    REJECTED("Rejected", new RejectedState());
 
-
-@Entity
-@Table(name = "review_state")
-public abstract class ReviewState {
-
-    @Transient
-    Review review;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id; 
-
-    @Column(nullable = false)
-    String name; 
-
-    ReviewState(Review review) {
-        this.review = review;
+    private final String name;
+    private final StateTransition state;
+    private ReviewState(String name, StateTransition state) {
+        this.name = name;
+        this.state = state;
     }
 
-    public ReviewState() {
-
+    void approve(Review review) {
+        state.approve(review);
     }
-
-    public abstract void  approve();
-
-    public abstract void reject();
+    void reject(Review review) {
+        state.reject(review);
+    }
 
     @Override
     public String toString() {
         return this.name;
+    }
+
+    private interface StateTransition {
+        void approve(Review review);
+        void reject(Review review);
+    }
+
+    private static class PendingState implements StateTransition {
+        @Override
+        public void approve(Review review) {
+            review.setState(APPROVED);
+        }
+
+        @Override
+        public void reject(Review review) {
+            review.setState(REJECTED);
+        }
+    }
+
+    private static class ApprovedState implements  StateTransition {
+        @Override
+        public void approve(Review review) {
+            throw new RuntimeException("Review already approved.");
+        }
+
+        @Override public void reject(Review review) {
+            review.setState(REJECTED);
+        }
+    }
+
+    private static class RejectedState implements  StateTransition {
+        @Override
+        public void approve(Review review) {
+            review.setState(APPROVED);
+        }
+
+        @Override public void reject(Review review) {
+            throw new RuntimeException("Review already rejected.");
+        }
     }
 }

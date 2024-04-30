@@ -1,7 +1,6 @@
 package snackscription.review.model;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.UUID;
@@ -22,10 +21,11 @@ public class Review {
     @Column(name = "content", nullable = false)
     private String content;
 
-//    @Transient
+
     @Setter
-    @ManyToOne
-    @JoinColumn(name = "state_id", nullable = false)
+    @Column(name = "state", nullable = false)
+//    @ManyToOne
+//    @JoinColumn(name = "state_id", nullable = false)
     private ReviewState state;
 
     @Column(name="user_id", nullable = false)
@@ -41,7 +41,7 @@ public class Review {
         this.id = UUID.randomUUID().toString();
         this.rating = rating;
         this.content = content;
-        this.state = new ReviewStatePending(this);
+        this.state = ReviewState.PENDING;
         this.userId = userId;
         this.subscriptionBoxId = subscriptionBoxId;
     }
@@ -57,5 +57,13 @@ public class Review {
             throw new RuntimeException("Rating should be between 0 and 5.");
         }
         this.rating = rating;
+    }
+
+    public void approve() {
+        this.state.approve(this);
+    }
+
+    public void reject() {
+        this.state.reject(this);
     }
 }
