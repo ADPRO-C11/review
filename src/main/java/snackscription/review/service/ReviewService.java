@@ -1,5 +1,6 @@
 package snackscription.review.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import snackscription.review.exception.ReviewNotFoundException;
@@ -22,4 +23,9 @@ public class ReviewService {
         
         return oReview.get(); 
     }
+
+    public List<Review> findBySubscriptionBoxId(String subscriptionBoxId) {
+        return reviewRepository.findBySubscriptionBoxId(subscriptionBoxId);
+    }
+
 }
