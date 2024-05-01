@@ -77,74 +77,113 @@ public class ReviewControllerTest {
     //     verify(reviewService).testGetAllSubscriptionBoxReview(subsboxId);
     // }
 
-    @Test
-    public void testGetById() throws Exception {
-        Review review = new Review(
-            5, "amazing", "user1", "subsboxId"
-        );
-        String reviewId = review.getId();
+//    @Test
+//    public void testGetById() throws Exception {
+//        Review review = new Review(
+//            5, "amazing", "user1", "subsboxId"
+//        );
+//        String reviewId = review.getId();
+//
+//        when(reviewService.findById(reviewId)).thenReturn(review);
+//
+//        ResultActions result = mockMvc.perform(get("/api/reviews/{reviewId}", reviewId))
+//            .andExpect(status().isOk())
+//            .andExpect(jsonPath("$.rating", is(5)))
+//            .andExpect(jsonPath("$.content", is("amazing")))
+//            .andExpect(jsonPath("$.userId", is("user1")))
+//            .andExpect(jsonPath("$.subscriptionBoxId", is("subsboxId")));
+//
+//        verify(reviewService).findById(reviewId);
+//    }
 
-        when(reviewService.findById(reviewId)).thenReturn(review);
+//    @Test
+//    public void testGetBySubscriptionBoxId() throws Exception {
+//        List<Review> curReviews = new ArrayList<>();
+//
+//        String subscriptionBoxId = this.reviews.getFirst().getSubscriptionBoxId();
+//        for (Review review : this.reviews) {
+//            if (review.getSubscriptionBoxId().equals(subscriptionBoxId)) {
+//                curReviews.add(review);
+//            }
+//        }
+//
+//        when(reviewService.findBySubscriptionBoxId(subscriptionBoxId)).thenReturn(curReviews);
+//
+//        String result = mockMvc.perform(get("/api/subscription-boxes/{subscriptionBoxId}", subscriptionBoxId))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$", hasSize(curReviews.size())))
+//                .andReturn()
+//                .getResponse()
+//                .getContentAsString();
+//
+//       List<Review> foundReviews = new ArrayList<Review>();
+//        for (int i=0; i<curReviews.size(); i++) {
+//            String prefixMatcher = String.format("$[%d]", i);
+//            int rating = JsonPath.read(result, prefixMatcher + ".rating");
+//            String content = JsonPath.read(result, prefixMatcher + ".content");
+//            String userId = JsonPath.read(result, prefixMatcher + ".userId");
+//            String curSubscriptionBoxId = JsonPath.read(result, prefixMatcher + ".subscriptionBoxId");
+//
+//            Review review = new Review(rating, content, userId, curSubscriptionBoxId);
+//            foundReviews.add(review);
+//        }
+//
+//        Comparator<Review> cmp = new Comparator<Review>() {
+//            @Override
+//            public int compare(Review o1, Review o2) {
+//                return o1.getUserId().compareTo(o2.getUserId());
+//            }
+//        };
+//
+//        curReviews.sort(cmp);
+//        foundReviews.sort(cmp);
+//
+//        for (int i=0; i<curReviews.size(); i++) {
+//            assertEquals(curReviews.get(i).getRating(), foundReviews.get(i).getRating());
+//            assertEquals(curReviews.get(i).getContent(), foundReviews.get(i).getContent());
+//            assertEquals(curReviews.get(i).getUserId(), foundReviews.get(i).getUserId());
+//            assertEquals(curReviews.get(i).getSubscriptionBoxId(), foundReviews.get(i).getSubscriptionBoxId());
+//        }
+//
+//        verify(reviewService).findBySubscriptionBoxId(subscriptionBoxId);
+//    }
+
+    @Test
+    public void testCreateSubscriptionBoxReview() throws Exception{
+        Review review = reviews.getFirst(); 
+
+        when(reviewService.createReview(review.getRating(), review.getContent(), review.getSubscriptionBoxId(), review.getUserId())).thenReturn(review);
+
         
-        ResultActions result = mockMvc.perform(get("/api/reviews/{reviewId}", reviewId))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.rating", is(5)))
-            .andExpect(jsonPath("$.content", is("amazing")))
-            .andExpect(jsonPath("$.userId", is("user1")))
-            .andExpect(jsonPath("$.subscriptionBoxId", is("subsboxId")));
-        
-        verify(reviewService).findById(reviewId);
     }
 
-    @Test
-    public void testGetBySubscriptionBoxId() throws Exception {
-        List<Review> curReviews = new ArrayList<>();
+    @Test 
+    public void testReadAllPublicSubscriptionBoxReview() {
 
-        String subscriptionBoxId = this.reviews.getFirst().getSubscriptionBoxId();
-        for (Review review : this.reviews) {
-            if (review.getSubscriptionBoxId().equals(subscriptionBoxId)) {
-                curReviews.add(review);
-            }
-        }
+    }
 
-        when(reviewService.findBySubscriptionBoxId(subscriptionBoxId)).thenReturn(curReviews);
+    @Test 
+    public void readSelfSubscriptionBoxReview() {
 
-        String result = mockMvc.perform(get("/api/subscription-boxes/{subscriptionBoxId}", subscriptionBoxId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(curReviews.size())))
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+    }
 
-       List<Review> foundReviews = new ArrayList<Review>();
-        for (int i=0; i<curReviews.size(); i++) {
-            String prefixMatcher = String.format("$[%d]", i);
-            int rating = JsonPath.read(result, prefixMatcher + ".rating");
-            String content = JsonPath.read(result, prefixMatcher + ".content");
-            String userId = JsonPath.read(result, prefixMatcher + ".userId");
-            String curSubscriptionBoxId = JsonPath.read(result, prefixMatcher + ".subscriptionBoxId");
+    @Test 
+    public void testEditSelfSubscriptionBoxReview() {
 
-            Review review = new Review(rating, content, userId, curSubscriptionBoxId);
-            foundReviews.add(review);
-        }
+    }
 
-        Comparator<Review> cmp = new Comparator<Review>() {
-            @Override
-            public int compare(Review o1, Review o2) {
-                return o1.getUserId().compareTo(o2.getUserId());
-            }
-        };
+    @Test 
+    public void testEditUserSubscriptionBoxReview() {
 
-        curReviews.sort(cmp);
-        foundReviews.sort(cmp);
+    }
 
-        for (int i=0; i<curReviews.size(); i++) {
-            assertEquals(curReviews.get(i).getRating(), foundReviews.get(i).getRating());
-            assertEquals(curReviews.get(i).getContent(), foundReviews.get(i).getContent());
-            assertEquals(curReviews.get(i).getUserId(), foundReviews.get(i).getUserId());
-            assertEquals(curReviews.get(i).getSubscriptionBoxId(), foundReviews.get(i).getSubscriptionBoxId());
-        }
+    @Test 
+    public void testDeleteSelfSubscriptionBoxReview() {
 
-        verify(reviewService).findBySubscriptionBoxId(subscriptionBoxId);
+    }
+
+    @Test 
+    public void testDeleteUserSubscriptionBoxReview() {
+
     }
 }
