@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.Resour
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,6 +92,27 @@ public class ReviewController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
    }
+
+    @DeleteMapping("/api/subscription-boxes/{subscriptionBoxId}/users/self")
+    public ResponseEntity<Review> deleteSelfSubscriptionBoxReview(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
+        try {
+            String userId = body.get("userId");
+            reviewService.deleteReview(subscriptionBoxId, userId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/api/subscription-boxes/{subscriptionBoxId}/users/{userId}")
+    public ResponseEntity<Review> deleteSubscriptionBoxReview(@PathVariable String subscriptionBoxId, @PathVariable String userId) {
+        try {
+            reviewService.deleteReview(subscriptionBoxId, userId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @GetMapping("/api/reviews/{subsboxId}")
     public List<Review> getBySubscriptionBoxId(@PathVariable String subsboxId) throws Exception {
