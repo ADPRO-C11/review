@@ -4,23 +4,40 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.UUID;
+import jakarta.persistence.*;
+
 
 @Getter
+@Setter
+@Entity
+@Table(name = "review")
 public class Review {
-    private final String id;
+    @Id
+    private String id;
+
+    @Column(name = "rating", nullable = false)
     private int rating;
-    @Setter
+
+    @Column(name = "content", nullable = false)
     private String content;
-    @Setter
+
+    @Column(name = "state", nullable = false)
     private ReviewState state;
-    private final String userId;
-    private final String subscriptionBoxId;
+
+    @Column(name="user_id", nullable = false)
+    private String userId;
+
+    @Column(name="subsbox_id", nullable = false)
+    private String subscriptionBoxId;
+
+    public Review() {
+    }
 
     public Review(int rating, String content, String userId, String subscriptionBoxId) {
         this.id = UUID.randomUUID().toString();
         this.rating = rating;
         this.content = content;
-        this.state = new ReviewStatePending(this);
+        this.state = ReviewState.PENDING;
         this.userId = userId;
         this.subscriptionBoxId = subscriptionBoxId;
     }
@@ -35,5 +52,13 @@ public class Review {
             throw new RuntimeException("Rating should be between 0 and 5.");
         }
         this.rating = rating;
+    }
+
+    public void approve() {
+        this.state.approve(this);
+    }
+
+    public void reject() {
+        this.state.reject(this);
     }
 }
