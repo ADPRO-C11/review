@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import snackscription.review.model.Review;
+import snackscription.review.model.ReviewState;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,9 +25,23 @@ public class ReviewRepositoryTest {
     @BeforeEach
     public void setUp() {
         this.reviews = new ArrayList<>();
-        reviews.add(new Review(5, "Bagus banget", "user_123", "subsbox_123"));
-        reviews.add(new Review(1, "Jelek banget", "user_124", "subsbox_123"));
-        reviews.add(new Review(2, "Lorem Ipsum", "user_124", "subsbox_124"));
+        
+        Review review1 = new Review(5, "I love it", "user_123", "subsbox_123");
+        Review review2 = new Review(1, "I hate it", "user_124", "subsbox_123");
+        Review review3 = new Review(2, "Hmmmm idk", "user_124", "subsbox_124");
+        Review review4 = new Review(3, "It's okay", "user_125", "subsbox_124");
+        Review review5 = new Review(4, "I like it", "user_126", "subsbox_124");
+
+        review1.setState(ReviewState.PENDING);
+        review4.setState(ReviewState.APPROVED);
+        review5.setState(ReviewState.REJECTED);
+
+        reviews = new ArrayList<>();
+        reviews.add(review1);
+        reviews.add(review2);
+        reviews.add(review3);
+        reviews.add(review4);
+        reviews.add(review5);
 
         reviewRepository.saveAll(reviews);
     }
@@ -43,6 +58,25 @@ public class ReviewRepositoryTest {
         }
 
         List <Review> foundReviews = reviewRepository.findBySubscriptionBoxId(subsbox_id);
+
+        assertEquals(curReviews.size(), foundReviews.size());
+        for (int i=0; i<curReviews.size(); i++) {
+            assertEqualReview(curReviews.get(i), foundReviews.get(i));
+        }
+    }
+
+    @Test
+    public void testFindBySubscriptionBoxIdAndState() {
+        List<Review> curReviews = new ArrayList<>();
+
+        String subsbox_id = this.reviews.getFirst().getSubscriptionBoxId();
+        for (Review review : this.reviews) {
+            if (review.getSubscriptionBoxId().equals(subsbox_id) && review.getState().equals(ReviewState.APPROVED)){
+                curReviews.add(review);
+            }
+        }
+
+        List <Review> foundReviews = reviewRepository.findBySubscriptionBoxIdAndState(subsbox_id, ReviewState.APPROVED);
 
         assertEquals(curReviews.size(), foundReviews.size());
         for (int i=0; i<curReviews.size(); i++) {
