@@ -78,4 +78,16 @@ public class ReviewService {
 
         reviewRepository.delete(review);
     }
+
+    public Review approveReview(String reviewId) throws Exception {
+        Review review = findById(reviewId);
+        review.approve();
+        return reviewRepository.save(review);
+    }
+
+    public Review rejectReview(String reviewId) throws Exception {
+        Review review = findById(reviewId);
+        review.reject();
+        return reviewRepository.save(review);
+    }
 }
