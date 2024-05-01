@@ -31,7 +31,7 @@ public class ReviewTest {
         assertEquals(userId, newReview.getUserId());
         assertEquals(subscriptionBoxId, newReview.getSubscriptionBoxId());
         assertNotNull(newReview.getId());
-        assertEquals("Pending", newReview.getState().toString());
+        assertEquals(ReviewState.PENDING, newReview.getState());
     }
 
     @Test
@@ -41,7 +41,7 @@ public class ReviewTest {
         this.review.editReview(newRating, newContent);
         assertEquals(newRating, this.review.getRating());
         assertEquals(newContent, this.review.getContent());
-        assertEquals("Pending", this.review.getState().toString());
+        assertEquals(ReviewState.PENDING, this.review.getState());
     }
 
     @Test
@@ -53,43 +53,43 @@ public class ReviewTest {
 
     @Test
     void testApprovePendingReview() {
-        this.review.setState(new ReviewStatePending(this.review));
-        this.review.getState().approve();
-        assertEquals("Approved", this.review.getState().toString());
+        this.review.setState(ReviewState.PENDING);
+        this.review.approve();
+        assertEquals(ReviewState.APPROVED, this.review.getState());
     }
 
     @Test
     void testRejectPendingReview() {
-        this.review.setState(new ReviewStatePending(this.review));
-        this.review.getState().reject();
-        assertEquals("Rejected", this.review.getState().toString());
+        this.review.setState(ReviewState.PENDING);
+        this.review.reject();
+        assertEquals(ReviewState.REJECTED, this.review.getState());
     }
 
     @Test
     void testApproveApprovedReview() {
-        this.review.setState(new ReviewStateApproved(this.review));
-        assertThrows(RuntimeException.class, () -> this.review.getState().approve());
-        assertEquals("Approved", this.review.getState().toString());
+        this.review.setState(ReviewState.APPROVED);
+        assertThrows(RuntimeException.class, () -> this.review.approve());
+        assertEquals(ReviewState.APPROVED, this.review.getState());
     }
 
     @Test
     void testRejectApprovedReview() {
-        this.review.setState(new ReviewStateApproved(this.review));
-        this.review.getState().reject();
-        assertEquals("Rejected", this.review.getState().toString());
+        this.review.setState(ReviewState.APPROVED);
+        this.review.reject();
+        assertEquals(ReviewState.REJECTED, this.review.getState());
     }
 
     @Test
     void testApproveRejectedReview() {
-        this.review.setState(new ReviewStateRejected(this.review));
-        this.review.getState().approve();
-        assertEquals("Approved", this.review.getState().toString());
+        this.review.setState(ReviewState.REJECTED);
+        this.review.approve();
+        assertEquals(ReviewState.APPROVED, this.review.getState());
     }
 
     @Test
     void testRejectRejectedReview() {
-        this.review.setState(new ReviewStateRejected(this.review));
-        assertThrows(RuntimeException.class, () -> this.review.getState().reject());
-        assertEquals("Rejected", this.review.getState().toString());
+        this.review.setState(ReviewState.REJECTED);
+        assertThrows(RuntimeException.class, () -> this.review.reject());
+        assertEquals(ReviewState.REJECTED, this.review.getState());
     }
 }

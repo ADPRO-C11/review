@@ -1,36 +1,57 @@
 package snackscription.review.model;
 
-import jakarta.persistence.*;
-
-
-@Entity
-@Table(name = "review_state")
-public abstract class ReviewState {
-
-    @Transient
-    Review review;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id; 
-
-    @Column(nullable = false)
-    String name; 
-
-    ReviewState(Review review) {
-        this.review = review;
+public enum ReviewState {
+    PENDING(new PendingState()),
+    APPROVED(new ApprovedState()),
+    REJECTED(new RejectedState());
+    private final StateTransition state;
+    private ReviewState(StateTransition state) {
+        this.state = state;
     }
 
-    public ReviewState() {
-
+    void approve(Review review) {
+        state.approve(review);
+    }
+    void reject(Review review) {
+        state.reject(review);
     }
 
-    public abstract void  approve();
+    private interface StateTransition {
+        void approve(Review review);
+        void reject(Review review);
+    }
 
-    public abstract void reject();
+    private static class PendingState implements StateTransition {
+        @Override
+        public void approve(Review review) {
+            review.setState(APPROVED);
+        }
 
-    @Override
-    public String toString() {
-        return this.name;
+        @Override
+        public void reject(Review review) {
+            review.setState(REJECTED);
+        }
+    }
+
+    private static class ApprovedState implements  StateTransition {
+        @Override
+        public void approve(Review review) {
+            throw new RuntimeException("Review already approved.");
+        }
+
+        @Override public void reject(Review review) {
+            review.setState(REJECTED);
+        }
+    }
+
+    private static class RejectedState implements  StateTransition {
+        @Override
+        public void approve(Review review) {
+            review.setState(APPROVED);
+        }
+
+        @Override public void reject(Review review) {
+            throw new RuntimeException("Review already rejected.");
+        }
     }
 }
