@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+
+import snackscription.review.exception.InvalidStateException;
 import snackscription.review.exception.ReviewNotFoundException;
 import snackscription.review.model.Review;
+import snackscription.review.model.ReviewState;
 import snackscription.review.repository.ReviewRepository;
 
 @Service
@@ -30,4 +33,49 @@ public class ReviewService {
         return reviewRepository.findBySubscriptionBoxId(subscriptionBoxId);
     }
 
+    public Review createReview(int rating, String content, String subscriptionBoxId, String userId) throws Exception {
+        Review review = new Review(rating, content, userId, subscriptionBoxId);
+        reviewRepository.save(review);
+        return review;
+    }
+
+    public List<Review> getAllSubscriptionBoxReview(String subscriptionBoxId, String state) throws Exception {
+        if (state == null) {
+            return reviewRepository.findBySubscriptionBoxId(subscriptionBoxId);
+        } else {
+            state = state.toUpperCase();
+            ReviewState reviewState = Enum.valueOf(ReviewState.class, state);
+            if (reviewState == null) {
+                throw new InvalidStateException();
+            }
+            return reviewRepository.findBySubscriptionBoxIdAndState(subscriptionBoxId, reviewState);
+        }        
+    }
+
+    public Review getReview(String subscriptionBoxId, String userId) throws Exception {
+        return reviewRepository.findBySubscriptionBoxIdAndUserId(subscriptionBoxId, userId);
+    }
+
+    public Review editReview(int rating, String content, String subscriptionBoxId, String userId) throws Exception {
+        Review review = reviewRepository.findBySubscriptionBoxIdAndUserId(subscriptionBoxId, userId); 
+
+        if (review == null) {
+            throw new ReviewNotFoundException();
+        }
+
+        review.setRating(rating);
+        review.setContent(content);
+
+        return reviewRepository.save(review);
+    }
+
+    public void deleteReview(String subscriptionBoxId, String userId) throws Exception {
+        Review review = reviewRepository.findBySubscriptionBoxIdAndUserId(subscriptionBoxId, userId); 
+
+        if (review == null) {
+            throw new ReviewNotFoundException();
+        }
+
+        reviewRepository.delete(review);
+    }
 }

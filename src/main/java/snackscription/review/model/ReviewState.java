@@ -1,14 +1,11 @@
 package snackscription.review.model;
 
 public enum ReviewState {
-    PENDING("Pending", new PendingState()),
-    APPROVED("Approved", new ApprovedState()),
-    REJECTED("Rejected", new RejectedState());
-
-    private final String name;
+    PENDING(new PendingState()),
+    APPROVED(new ApprovedState()),
+    REJECTED(new RejectedState());
     private final StateTransition state;
-    private ReviewState(String name, StateTransition state) {
-        this.name = name;
+    private ReviewState(StateTransition state) {
         this.state = state;
     }
 
@@ -17,11 +14,6 @@ public enum ReviewState {
     }
     void reject(Review review) {
         state.reject(review);
-    }
-
-    @Override
-    public String toString() {
-        return this.name;
     }
 
     private interface StateTransition {

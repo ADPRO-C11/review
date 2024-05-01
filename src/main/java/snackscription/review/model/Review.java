@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 
 
 @Getter
+@Setter
 @Entity
 @Table(name = "review")
 public class Review {
@@ -17,15 +18,10 @@ public class Review {
     @Column(name = "rating", nullable = false)
     private int rating;
 
-    @Setter
     @Column(name = "content", nullable = false)
     private String content;
 
-
-    @Setter
     @Column(name = "state", nullable = false)
-//    @ManyToOne
-//    @JoinColumn(name = "state_id", nullable = false)
     private ReviewState state;
 
     @Column(name="user_id", nullable = false)
@@ -45,7 +41,6 @@ public class Review {
         this.userId = userId;
         this.subscriptionBoxId = subscriptionBoxId;
     }
-
 
     public void editReview(int rating, String content) {
         this.setRating(rating);

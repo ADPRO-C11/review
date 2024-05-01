@@ -15,4 +15,9 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     public ResponseEntity<Review> handleReviewNotFound(ReviewNotFoundException exc, WebRequest req) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(InvalidStateException.class)
+    public ResponseEntity<Review> handleInvalidState(InvalidStateException exc, WebRequest req) {
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 }
