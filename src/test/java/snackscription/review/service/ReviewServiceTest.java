@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.naming.spi.DirStateFactory.Result;
 import javax.swing.text.html.Option;
@@ -26,10 +27,13 @@ import snackscription.review.exception.ReviewNotFoundException;
 import snackscription.review.model.Review;
 import snackscription.review.model.ReviewState;
 import snackscription.review.repository.ReviewRepository;
+import snackscription.review.service.SentimentAnalysisService;
 
 @ExtendWith(MockitoExtension.class)
 public class ReviewServiceTest {
-    
+
+    @Mock
+    SentimentAnalysisService sentimentAnalysisService;
     @Mock
     ReviewRepository reviewRepo;
 
@@ -58,6 +62,7 @@ public class ReviewServiceTest {
     @BeforeEach
     public void setUp() {
         reviewService = new ReviewService(reviewRepo);
+        sentimentAnalysisService = new SentimentAnalysisService();
 
         Review review1 = new Review(5, "I love it", "user_123", "subsbox_123");
         Review review2 = new Review(1, "I hate it", "user_124", "subsbox_123");
@@ -243,8 +248,18 @@ public class ReviewServiceTest {
     }
 
     @Test
-    public void analyzeSentimentAsyncTest() {
+    public void testAnalyzeSentimentAsyncTest() {
+        String reviewText = "This is a great product!";
+        String expectedSentiment = "positive";
 
+        when(sentimentAnalysisService.analyze(reviewText)).thenReturn(expectedSentiment);
+
+        CompletableFuture<String> sentimentFuture = reviewService.analyzeSentimentAsync(reviewText);
+
+        String actualSentiment = sentimentFuture.join();
+        verify(sentimentAnalysisService).analyze(reviewText);
+
+        assertEquals(expectedSentiment, actualSentiment);
     }
 }
 
