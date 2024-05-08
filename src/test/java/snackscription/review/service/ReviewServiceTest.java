@@ -241,5 +241,10 @@ public class ReviewServiceTest {
         assertEquals(review1.getUserId(), review2.getUserId());
         assertEquals(review1.getSubscriptionBoxId(), review2.getSubscriptionBoxId());
     }
+
+    @Test
+    public void analyzeSentimentAsyncTest() {
+
+    }
 }
 

@@ -2,7 +2,9 @@ package snackscription.review.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import snackscription.review.exception.InvalidStateException;
@@ -14,6 +16,7 @@ import snackscription.review.repository.ReviewRepository;
 @Service
 public class ReviewService {
     private ReviewRepository reviewRepository;
+    private SentimentAnalysisService sentimentAnalysisService;
 
     public ReviewService (ReviewRepository reviewRepository) {
         this.reviewRepository = reviewRepository;
@@ -89,5 +92,11 @@ public class ReviewService {
         Review review = findById(reviewId);
         review.reject();
         return reviewRepository.save(review);
+    }
+
+    @Async
+    public CompletableFuture<String> analyzeSentimentAsync(String reviewText) {
+        String sentiment = sentimentAnalysisService.analyze(reviewText);
+        return CompletableFuture.completedFuture(sentiment);
     }
 }
