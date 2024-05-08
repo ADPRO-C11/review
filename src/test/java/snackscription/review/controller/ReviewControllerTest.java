@@ -78,7 +78,7 @@ public class ReviewControllerTest {
 
         when(reviewService.createReview(review.getRating(), review.getContent(), review.getSubscriptionBoxId(), review.getUserId())).thenReturn(review);
         
-        ResultActions result = mockMvc.perform(post("/api/subscription-boxes/{subscriptionBoxId}", review.getSubscriptionBoxId())
+        ResultActions result = mockMvc.perform(post("/subscription-boxes/{subscriptionBoxId}", review.getSubscriptionBoxId())
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"rating\": 5, \"content\": \"I love it\", \"userId\": \"user_123\"}"))
             .andExpect(status().isCreated())
@@ -102,7 +102,7 @@ public class ReviewControllerTest {
 
         when(reviewService.getAllSubscriptionBoxReview(subsboxId, "APPROVED")).thenReturn(approvedReviews);
 
-        String result = mockMvc.perform(get("/api/subscription-boxes/{subscriptionBoxId}", subsboxId))
+        String result = mockMvc.perform(get("/subscription-boxes/{subscriptionBoxId}", subsboxId))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$", hasSize(approvedReviews.size())))
                .andReturn()
@@ -149,7 +149,7 @@ public class ReviewControllerTest {
 
         when(reviewService.getReview(subsboxId, userId)).thenReturn(review);
 
-        ResultActions result = mockMvc.perform(get("/api/subscription-boxes/{subscriptionBoxId}/users/self", subsboxId)
+        ResultActions result = mockMvc.perform(get("/subscription-boxes/{subscriptionBoxId}/users/self", subsboxId)
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"userId\": \"user_123\"}"))
             .andExpect(status().isOk())
@@ -171,7 +171,7 @@ public class ReviewControllerTest {
         String newContent = "Awikwok"; 
         when(reviewService.editReview(newRating, newContent, subsboxId, userId)).thenReturn(new Review(newRating, newContent, userId, subsboxId));
 
-        ResultActions result = mockMvc.perform(put("/api/subscription-boxes/{subscriptionBoxId}/users/self", subsboxId)
+        ResultActions result = mockMvc.perform(put("/subscription-boxes/{subscriptionBoxId}/users/self", subsboxId)
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"rating\": 4, \"content\": \"Awikwok\", \"userId\": \"user_123\"}"))
             .andExpect(status().isOk())
@@ -191,7 +191,7 @@ public class ReviewControllerTest {
 
         doNothing().when(reviewService).deleteReview(subsboxId, userId);
 
-        ResultActions result = mockMvc.perform(delete("/api/subscription-boxes/{subscriptionBoxId}/users/self", subsboxId)
+        ResultActions result = mockMvc.perform(delete("/subscription-boxes/{subscriptionBoxId}/users/self", subsboxId)
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"userId\": \"user_123\"}"))
             .andExpect(status().isNoContent());
@@ -207,7 +207,7 @@ public class ReviewControllerTest {
 
         doNothing().when(reviewService).deleteReview(subsboxId, userId);
 
-        ResultActions result = mockMvc.perform(delete("/api/subscription-boxes/{subscriptionBoxId}/users/{userId}", subsboxId, userId)              
+        ResultActions result = mockMvc.perform(delete("/subscription-boxes/{subscriptionBoxId}/users/{userId}", subsboxId, userId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -224,7 +224,7 @@ public class ReviewControllerTest {
 
         when(reviewService.approveReview(reviewId)).thenReturn(approvedReview);
         
-        ResultActions result = mockMvc.perform(put("/api/reviews/{reviewId}/approve", reviewId))
+        ResultActions result = mockMvc.perform(put("/reviews/{reviewId}/approve", reviewId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rating", is(review.getRating())))
             .andExpect(jsonPath("$.content", is(review.getContent())))
@@ -245,7 +245,7 @@ public class ReviewControllerTest {
 
         when(reviewService.rejectReview(reviewId)).thenReturn(rejectedReview);
         
-        ResultActions result = mockMvc.perform(put("/api/reviews/{reviewId}/reject", reviewId))
+        ResultActions result = mockMvc.perform(put("/reviews/{reviewId}/reject", reviewId))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rating", is(review.getRating())))
             .andExpect(jsonPath("$.content", is(review.getContent())))

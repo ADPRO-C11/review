@@ -43,7 +43,7 @@ public class ReviewController {
         return ResponseEntity.ok().body("Welcome to the review service!");
     }
 
-    @PostMapping("/api/subscription-boxes/{subscriptionBoxId}")
+    @PostMapping("/subscription-boxes/{subscriptionBoxId}")
     public ResponseEntity<Review> createSubscriptionBoxReview(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
         
         try {
@@ -58,7 +58,7 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("/api/subscription-boxes/{subscriptionBoxId}")
+    @GetMapping("/subscription-boxes/{subscriptionBoxId}")
     public ResponseEntity<List<Review>> getAllPublicSubscriptionBoxReview(@PathVariable String subscriptionBoxId) {
         try {
             List<Review> reviews = reviewService.getAllSubscriptionBoxReview(subscriptionBoxId, "APPROVED");
@@ -68,7 +68,7 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("/api/subscription-boxes/{subscriptionBoxId}/users/self")
+    @GetMapping("/subscription-boxes/{subscriptionBoxId}/users/self")
     public ResponseEntity<Review> getSelfSubscriptionBoxReview(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
         try {
             String userId = body.get("userId");
@@ -79,7 +79,7 @@ public class ReviewController {
         }
     }
 
-    @PutMapping("/api/subscription-boxes/{subscriptionBoxId}/users/self")
+    @PutMapping("/subscription-boxes/{subscriptionBoxId}/users/self")
     public ResponseEntity<Review> editSelfSubscriptionBoxId(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
         try {
             String userId = body.get("userId");
@@ -93,7 +93,7 @@ public class ReviewController {
         }
    }
 
-    @DeleteMapping("/api/subscription-boxes/{subscriptionBoxId}/users/self")
+    @DeleteMapping("/subscription-boxes/{subscriptionBoxId}/users/self")
     public ResponseEntity<Review> deleteSelfSubscriptionBoxReview(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
         try {
             String userId = body.get("userId");
@@ -104,7 +104,7 @@ public class ReviewController {
         }
     }
 
-    @DeleteMapping("/api/subscription-boxes/{subscriptionBoxId}/users/{userId}")
+    @DeleteMapping("/subscription-boxes/{subscriptionBoxId}/users/{userId}")
     public ResponseEntity<Review> deleteSubscriptionBoxReview(@PathVariable String subscriptionBoxId, @PathVariable String userId) {
         try {
             reviewService.deleteReview(subscriptionBoxId, userId);
@@ -114,17 +114,17 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("/api/reviews/{subsboxId}")
+    @GetMapping("/reviews/{subsboxId}")
     public List<Review> getBySubscriptionBoxId(@PathVariable String subsboxId) throws Exception {
         return reviewService.getAllSubscriptionBoxReview(subsboxId, null); 
     }
 
-    @GetMapping("/api/reviews/{reviewId}")
+    @GetMapping("/reviews/{reviewId}")
     public Review getById(@PathVariable String reviewId) throws Exception {
         return reviewService.findById(reviewId); 
     }
 
-    @PutMapping("/api/reviews/{reviewId}/approve")
+    @PutMapping("/reviews/{reviewId}/approve")
     public ResponseEntity<Review> approveReview(@PathVariable String reviewId) {
         try {
             Review review = reviewService.approveReview(reviewId);
@@ -134,7 +134,7 @@ public class ReviewController {
         }
     }
 
-    @PutMapping("/api/reviews/{reviewId}/reject")
+    @PutMapping("/reviews/{reviewId}/reject")
     public ResponseEntity<Review> rejectReview(@PathVariable String reviewId) {
         try {
             Review review = reviewService.rejectReview(reviewId);
