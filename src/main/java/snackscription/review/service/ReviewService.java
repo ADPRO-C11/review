@@ -2,7 +2,10 @@ package snackscription.review.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import snackscription.review.exception.InvalidStateException;
@@ -13,8 +16,10 @@ import snackscription.review.model.ReviewState;
 import snackscription.review.repository.ReviewRepository;
 
 @Service
+@Component
 public class ReviewService {
     private ReviewRepository reviewRepository;
+    private AtomicInteger activeUsers = null;
 
     public ReviewService (ReviewRepository reviewRepository) {
         this.reviewRepository = reviewRepository;
