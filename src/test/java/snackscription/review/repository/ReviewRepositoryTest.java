@@ -2,7 +2,6 @@ package snackscription.review.repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,12 +24,12 @@ public class ReviewRepositoryTest {
     @BeforeEach
     public void setUp() {
         this.reviews = new ArrayList<>();
-        
-        Review review1 = new Review(5, "I love it", "user_123", "subsbox_123");
-        Review review2 = new Review(1, "I hate it", "user_124", "subsbox_123");
-        Review review3 = new Review(2, "Hmmmm idk", "user_124", "subsbox_124");
-        Review review4 = new Review(3, "It's okay", "user_125", "subsbox_124");
-        Review review5 = new Review(4, "I like it", "user_126", "subsbox_124");
+
+        Review review1 = new Review(5, "I love it", "subsbox_123", "user_123");
+        Review review2 = new Review(1, "I hate it", "subsbox_123", "user_124");
+        Review review3 = new Review(2, "Hmmmm idk", "subsbox_124", "user_124");
+        Review review4 = new Review(3, "It's okay", "subsbox_124", "user_125");
+        Review review5 = new Review(4, "I like it", "subsbox_124", "user_126");
 
         review1.setState(ReviewState.PENDING);
         review4.setState(ReviewState.APPROVED);
@@ -50,14 +49,14 @@ public class ReviewRepositoryTest {
     public void testFindBySubscriptionBoxId() {
         List<Review> curReviews = new ArrayList<>();
 
-        String subsbox_id = this.reviews.getFirst().getSubscriptionBoxId();
+        String subsbox_id = this.reviews.getFirst().getSubsbox();
         for (Review review : this.reviews) {
-            if (review.getSubscriptionBoxId().equals(subsbox_id)) {
+            if (review.getSubsbox().equals(subsbox_id)) {
                 curReviews.add(review);
             }
         }
 
-        List <Review> foundReviews = reviewRepository.findBySubscriptionBoxId(subsbox_id);
+        List <Review> foundReviews = reviewRepository.findByIdSubsbox(subsbox_id);
 
         assertEquals(curReviews.size(), foundReviews.size());
         for (int i=0; i<curReviews.size(); i++) {
@@ -69,14 +68,14 @@ public class ReviewRepositoryTest {
     public void testFindBySubscriptionBoxIdAndState() {
         List<Review> curReviews = new ArrayList<>();
 
-        String subsbox_id = this.reviews.getFirst().getSubscriptionBoxId();
+        String subsbox_id = this.reviews.getFirst().getSubsbox();
         for (Review review : this.reviews) {
-            if (review.getSubscriptionBoxId().equals(subsbox_id) && review.getState().equals(ReviewState.APPROVED)){
+            if (review.getSubsbox().equals(subsbox_id) && review.getState().equals(ReviewState.APPROVED)){
                 curReviews.add(review);
             }
         }
 
-        List <Review> foundReviews = reviewRepository.findBySubscriptionBoxIdAndState(subsbox_id, ReviewState.APPROVED);
+        List <Review> foundReviews = reviewRepository.findByIdSubsboxAndState(subsbox_id, ReviewState.APPROVED);
 
         assertEquals(curReviews.size(), foundReviews.size());
         for (int i=0; i<curReviews.size(); i++) {
@@ -87,8 +86,7 @@ public class ReviewRepositoryTest {
     @Test
     public void testFindBySubscriptionBoxIdAndUserId() {
         Review review = this.reviews.getFirst();
-
-        Review foundReview = reviewRepository.findBySubscriptionBoxIdAndUserId(review.getSubscriptionBoxId(), review.getUserId());
+        Review foundReview = reviewRepository.findByIdSubsboxAndIdAuthor(review.getSubsbox(), review.getAuthor());
         assertEqualReview(review, foundReview);
     }
 
@@ -96,8 +94,8 @@ public class ReviewRepositoryTest {
     public void testDeleteBySubscriptionBoxIdAndUserId() {
         Review review = this.reviews.getFirst();
 
-        reviewRepository.deleteBySubscriptionBoxIdAndUserId(review.getSubscriptionBoxId(), review.getUserId());
-        Review foundReview = reviewRepository.findBySubscriptionBoxIdAndUserId(review.getSubscriptionBoxId(), review.getUserId());
+        reviewRepository.deleteByIdSubsboxAndIdAuthor(review.getSubsbox(), review.getAuthor());
+        Review foundReview = reviewRepository.findByIdSubsboxAndIdAuthor(review.getSubsbox(), review.getAuthor());
 
         assertNull(foundReview);
     }
@@ -105,7 +103,7 @@ public class ReviewRepositoryTest {
     public void assertEqualReview(Review review1, Review review2) {
         assertEquals(review1.getRating(), review2.getRating());
         assertEquals(review1.getContent(), review2.getContent());
-        assertEquals(review1.getUserId(), review2.getUserId());
-        assertEquals(review1.getSubscriptionBoxId(), review2.getSubscriptionBoxId());
+        assertEquals(review1.getAuthor(), review2.getAuthor());
+        assertEquals(review1.getSubsbox(), review2.getSubsbox());
     }
 }
