@@ -2,6 +2,9 @@ package snackscription.review.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import org.springframework.scheduling.annotation.Async;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
@@ -19,6 +22,7 @@ import snackscription.review.repository.ReviewRepository;
 @Component
 public class ReviewService {
     private ReviewRepository reviewRepository;
+    private SentimentAnalysisService sentimentAnalysisService;
 
     public ReviewService (ReviewRepository reviewRepository) {
         this.reviewRepository = reviewRepository;
@@ -76,6 +80,12 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
+    @Async
+    public CompletableFuture<String> analyzeSentimentAsync(String reviewText) {
+        String sentiment = sentimentAnalysisService.analyze(reviewText);
+        return CompletableFuture.completedFuture(sentiment);
+    }
+  
     public void deleteReview(String subsbox, String user) throws Exception {
         Review review = reviewRepository.findByIdSubsboxAndIdAuthor(subsbox, user);
 
