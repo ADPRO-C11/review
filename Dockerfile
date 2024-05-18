@@ -10,6 +10,7 @@ ENV JDBC_DATABASE_URL ${JDBC_DATABASE_URL}
 ENV JDBC_DATABASE_USERNAME ${JDBC_DATABASE_USERNAME}
 
 WORKDIR /app
-COPY build/libs/review-0.0.1-SNAPSHOT.jar /app/review-0.0.1-SNAPSHOT.jar
+COPY ./review-0.0.1-SNAPSHOT.jar /app
+RUN ls -la
 EXPOSE 8080
 CMD ["java","-jar","review-0.0.1-SNAPSHOT.jar"]
