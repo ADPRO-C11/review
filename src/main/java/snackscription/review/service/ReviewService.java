@@ -19,7 +19,6 @@ import snackscription.review.repository.ReviewRepository;
 @Component
 public class ReviewService {
     private ReviewRepository reviewRepository;
-    private AtomicInteger activeUsers = null;
 
     public ReviewService (ReviewRepository reviewRepository) {
         this.reviewRepository = reviewRepository;
