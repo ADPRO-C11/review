@@ -1,19 +1,15 @@
 package snackscription.review.model;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.UUID;
+import lombok.Data;
 import jakarta.persistence.*;
 
 
-@Getter
-@Setter
+@Data
 @Entity
-@Table(name = "review")
+@Table
 public class Review {
-    @Id
-    private String id;
+    @EmbeddedId
+    private ReviewId id;
 
     @Column(name = "rating", nullable = false)
     private int rating;
@@ -24,22 +20,14 @@ public class Review {
     @Column(name = "state", nullable = false)
     private ReviewState state;
 
-    @Column(name="user_id", nullable = false)
-    private String userId;
-
-    @Column(name="subsbox_id", nullable = false)
-    private String subscriptionBoxId;
-
     public Review() {
     }
 
-    public Review(int rating, String content, String userId, String subscriptionBoxId) {
-        this.id = UUID.randomUUID().toString();
+    public Review(int rating, String content, String subsbox, String user) {
+        this.id = new ReviewId(subsbox, user);
         this.rating = rating;
         this.content = content;
         this.state = ReviewState.PENDING;
-        this.userId = userId;
-        this.subscriptionBoxId = subscriptionBoxId;
     }
 
     public void editReview(int rating, String content) {
@@ -60,5 +48,13 @@ public class Review {
 
     public void reject() {
         this.state.reject(this);
+    }
+
+    public String getSubsbox() {
+        return this.id.getSubsbox();
+    }
+
+    public String getAuthor() {
+        return this.id.getAuthor();
     }
 }

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snackscription-review-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: snackscription-review
+  template:
+    metadata:
+      labels:
+        app: snackscription-review
+    spec:
+      containers:
+        - name: snackscription-review
+          image: asteriskzie/snackscription-review:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PRODUCTION
+              value: prod
