@@ -25,11 +25,11 @@ public class ReviewTest {
         String userId = "33";
         String subscriptionBoxId = "12345";
 
-        Review newReview = new Review(rating, content, userId, subscriptionBoxId);
+        Review newReview = new Review(rating, content, subscriptionBoxId, userId);
         assertEquals(rating, newReview.getRating());
         assertEquals(content, newReview.getContent());
-        assertEquals(userId, newReview.getUserId());
-        assertEquals(subscriptionBoxId, newReview.getSubscriptionBoxId());
+        assertEquals(userId, newReview.getId().getAuthor());
+        assertEquals(subscriptionBoxId, newReview.getId().getSubsbox());
         assertNotNull(newReview.getId());
         assertEquals(ReviewState.PENDING, newReview.getState());
     }
