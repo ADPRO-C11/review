@@ -70,6 +70,8 @@ jobs:
           ./gradlew check --info --stacktrace
           ./gradlew test
           ./gradlew jacocoTestReport
+        env:
+          PRODUCTION: test
       # (Optional) Add steps for generating coverage report and other post-test tasks
 
   publish:
