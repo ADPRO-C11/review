@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import snackscription.review.exception.ReviewNotFoundException;
 import snackscription.review.model.Review;
+import snackscription.review.model.ReviewId;
 import snackscription.review.model.ReviewState;
 import snackscription.review.repository.ReviewRepository;
 
@@ -55,8 +56,6 @@ public class ReviewServiceTest {
 
     @Test
     public void getReviewsBySubscriptionBoxId() throws Exception {
-        ReviewService reviewService = new ReviewService(reviewRepo);
-
         List<Review> curReviews = new ArrayList<>();
 
         String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
@@ -76,9 +75,14 @@ public class ReviewServiceTest {
     }
 
     @Test
+    public void getReviewBySubsboxIdNotFound() throws Exception {
+
+    }
+
+    @Test
     public void testCreateReview() throws Exception {
         Review review = reviews.getFirst();
-        
+
         when(reviewRepo.save(any(Review.class))).thenReturn(review);
 
         Review savedReview = reviewService.createReview(
@@ -93,7 +97,37 @@ public class ReviewServiceTest {
     }
 
     @Test
-    public void testgetSubsboxReview() throws Exception {
+    public void testCreateReviewUserNotFound() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateReviewSubsboxNotFound() throws Exception {
+
+    }
+
+    @Test
+    public void testCreateReviewAlreadyExist() throws Exception {
+        Review review = reviews.get(0);
+        when(reviewRepo.existsById(review.getId())).thenReturn(true);
+
+        assertThrows(Exception.class, () -> {
+            reviewService.createReview(review.getRating(), review.getContent(), review.getSubsbox(), review.getAuthor());
+        });
+
+        verify(reviewRepo).existsById(review.getId());
+    }
+
+    @Test
+    public void testCreateReviewInvalidRating() throws Exception {
+        Review review = reviews.get(0);
+        assertThrows(Exception.class, () -> {
+            reviewService.createReview(-1, review.getContent(), review.getSubsbox(), review.getAuthor());
+        });
+    }
+
+    @Test
+    public void testGetSubsboxReview() throws Exception {
         String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
 
         List<Review> curReviews = new ArrayList<>();
@@ -158,7 +192,46 @@ public class ReviewServiceTest {
     }
 
     @Test
+    public void testEditReviewNotFound() throws Exception {
+        Review review = reviews.getFirst();
+        String subsbox = review.getSubsbox();
+        String author = review.getAuthor();
+
+        int newRating = 1;
+        String newContent = "Changed content";
+        Review newReview = new Review(newRating, newContent, author, subsbox);
+        newReview.setId(review.getId());
+
+        when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(review);
+        when(reviewRepo.save(any(Review.class))).thenReturn(newReview);
+
+        Review editedReview = reviewService.editReview(newRating, newContent, subsbox, author);
+
+        assertEquals(newRating, editedReview.getRating());
+        assertEquals(newContent, editedReview.getContent());
+        assertEquals(subsbox, editedReview.getSubsbox());
+        assertEquals(author, editedReview.getAuthor());
+        assertEquals(review.getId(), editedReview.getId());
+    }
+
+    @Test
     public void testDeleteReview() throws Exception {
+        String subsbox = this.reviews.getFirst().getSubsbox();
+        String author = this.reviews.getFirst().getAuthor();
+
+        Review review = reviews.getFirst();
+
+        when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(review);
+
+        reviewService.deleteReview(subsbox, author);
+
+        assertThrows(ReviewNotFoundException.class, () -> reviewService.getReview(subsbox, author));
+
+        verify(reviewRepo).delete(review);
+    }
+
+    @Test
+    public void testDeleteReviewNotFound() throws Exception {
         String subsbox = this.reviews.getFirst().getSubsbox();
         String author = this.reviews.getFirst().getAuthor();
 
