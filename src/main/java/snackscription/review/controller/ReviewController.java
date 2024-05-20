@@ -3,6 +3,7 @@ package snackscription.review.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -97,25 +98,5 @@ public class ReviewController {
     @GetMapping("/subscription-boxes/{subsbox}")
     public List<Review> getSubsboxReview(@PathVariable String subsbox) throws Exception {
         return reviewService.getSubsboxReview(subsbox, null); 
-    }
-
-    @PutMapping("/subscription-boxes/{subsbox}/users/{user}/approve")
-    public ResponseEntity<Review> approveReview(@PathVariable String subsbox, @PathVariable String user) {
-        try {
-            Review review = reviewService.approveReview(subsbox, user);
-            return new ResponseEntity<>(review, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @PutMapping("/subscription-boxes/{subsbox}/users/{user}/reject")
-    public ResponseEntity<Review> rejectReview(@PathVariable String subsbox, @PathVariable String user) {
-        try {
-            Review review = reviewService.rejectReview(subsbox, user);
-            return new ResponseEntity<>(review, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
     }
 }

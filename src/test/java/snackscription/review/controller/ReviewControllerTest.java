@@ -199,46 +199,6 @@ public class ReviewControllerTest {
         verify(reviewService).deleteReview(subsbox, author);
     }
 
-    @Test
-    public void testApproveReview() throws Exception {
-        Review review = reviews.getFirst();
-
-        Review approvedReview = new Review(review.getRating(), review.getContent(), review.getSubsbox(), review.getAuthor());
-        approvedReview.setState(ReviewState.APPROVED);
-
-        when(reviewService.approveReview(review.getSubsbox(), review.getAuthor())).thenReturn(approvedReview);
-        
-        ResultActions result = mockMvc.perform(put("/reviews/subscription-boxes/{subsbox}/users/{author}/approve", review.getSubsbox(), review.getAuthor()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.rating", is(review.getRating())))
-            .andExpect(jsonPath("$.content", is(review.getContent())))
-            .andExpect(jsonPath("$.author", is(review.getAuthor())))
-            .andExpect(jsonPath("$.subsbox", is(review.getSubsbox())))
-            .andExpect(jsonPath("$.state", is("APPROVED")));
-
-        verify(reviewService).approveReview(review.getSubsbox(), review.getAuthor());
-    }
-
-    @Test 
-    public void testRejectReview() throws Exception {
-        Review review = reviews.getFirst();
-
-        Review approvedReview = new Review(review.getRating(), review.getContent(), review.getSubsbox(), review.getAuthor());
-        approvedReview.setState(ReviewState.REJECTED);
-
-        when(reviewService.approveReview(review.getSubsbox(), review.getAuthor())).thenReturn(approvedReview);
-
-        ResultActions result = mockMvc.perform(put("/reviews/subscription-boxes/{subsbox}/users/{author}/approve", review.getSubsbox(), review.getAuthor()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.rating", is(review.getRating())))
-                .andExpect(jsonPath("$.content", is(review.getContent())))
-                .andExpect(jsonPath("$.author", is(review.getAuthor())))
-                .andExpect(jsonPath("$.subsbox", is(review.getSubsbox())))
-                .andExpect(jsonPath("$.state", is("REJECTED")));
-
-        verify(reviewService).approveReview(review.getSubsbox(), review.getAuthor());
-    }
-
 //     @Test
 //     public void testGetAllSubscriptionBoxReview() {
 //         String subsboxId = "subsboxId";
