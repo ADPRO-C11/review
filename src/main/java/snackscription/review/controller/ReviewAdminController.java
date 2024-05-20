@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import snackscription.review.model.Review;
 import snackscription.review.service.ReviewService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin")
 public class ReviewAdminController {
@@ -34,4 +36,13 @@ public class ReviewAdminController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
+    @GetMapping("/subscription-boxes/{subsbox}/reviews")
+    public ResponseEntity<List<Review>> getSubsboxReviews(
+            @PathVariable String subsbox,
+            @RequestParam(required = false) String state) throws Exception {
+        List<Review> reviews = reviewService.getSubsboxReview(subsbox, state);
+        return ResponseEntity.ok().body(reviews);
+    }
+
 }
