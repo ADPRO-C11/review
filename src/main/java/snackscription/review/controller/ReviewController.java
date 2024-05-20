@@ -12,7 +12,7 @@ import snackscription.review.model.Review;
 import snackscription.review.service.ReviewService;
 
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("")
 public class ReviewController {
     private ReviewService reviewService;
 

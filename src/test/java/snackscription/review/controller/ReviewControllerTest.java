@@ -69,7 +69,7 @@ public class ReviewControllerTest {
 
         when(reviewService.createReview(review.getRating(), review.getContent(), review.getId().getSubsbox(), review.getId().getAuthor())).thenReturn(review);
         
-        ResultActions result = mockMvc.perform(post("/reviews/subscription-boxes/{subsbox}", review.getSubsbox())
+        ResultActions result = mockMvc.perform(post("/subscription-boxes/{subsbox}", review.getSubsbox())
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"rating\": 5, \"content\": \"I love it\", \"author\": \"user_123\"}"))
             .andExpect(status().isCreated())
@@ -82,7 +82,7 @@ public class ReviewControllerTest {
     }
 
     @Test 
-    public void testReadAllPublicSubscriptionBoxReview() throws Exception {
+    public void testReadAllPublicSubsboxReviews() throws Exception {
         List<Review> approvedReviews = new ArrayList<>();
         String subsbox = "subsbox_124";
         for (Review review : reviews) {
@@ -93,7 +93,7 @@ public class ReviewControllerTest {
 
         when(reviewService.getSubsboxReview(subsbox, "APPROVED")).thenReturn(approvedReviews);
 
-        String result = mockMvc.perform(get("/reviews/subscription-boxes/{subsbox}/public", subsbox))
+        String result = mockMvc.perform(get("/subscription-boxes/{subsbox}/public", subsbox))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$", hasSize(approvedReviews.size())))
                .andReturn()
@@ -134,7 +134,7 @@ public class ReviewControllerTest {
 
         when(reviewService.getReview(subsbox, author)).thenReturn(review);
 
-        ResultActions result = mockMvc.perform(get("/reviews/subscription-boxes/{subscriptionBoxId}/users/{author}", subsbox, author)
+        ResultActions result = mockMvc.perform(get("/subscription-boxes/{subscriptionBoxId}/users/{author}", subsbox, author)
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"author\": \"user_123\"}"))
             .andExpect(status().isOk())
@@ -192,7 +192,7 @@ public class ReviewControllerTest {
 
         doNothing().when(reviewService).deleteReview(subsbox, author);
 
-        ResultActions result = mockMvc.perform(delete("/reviews/subscription-boxes/{subsbox}/users/{author}", subsbox, author)
+        ResultActions result = mockMvc.perform(delete("/subscription-boxes/{subsbox}/users/{author}", subsbox, author)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
