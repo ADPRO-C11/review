@@ -18,13 +18,35 @@ import snackscription.review.repository.ReviewRepository;
 @Service
 @Component
 public class ReviewService {
-    private ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
 
     public ReviewService (ReviewRepository reviewRepository) {
         this.reviewRepository = reviewRepository;
     }
 
+    public boolean reviewExist(String subsbox, String user) {
+        return reviewRepository.existsById(new ReviewId(subsbox, user));
+    }
+
+    public boolean subsboxExist(String subsbox) {
+        //TODO: connect to subsbox service
+        return true;
+    }
+
+    public  boolean userExist(String user) {
+        //TODO: connect to user service
+        return true;
+    }
+
     public Review createReview(int rating, String content, String subscriptionBoxId, String userId) throws Exception {
+        if (reviewExist(subscriptionBoxId, userId)) {
+            throw new Exception("User has made a review for this subscription box.");
+        }
+
+        if (rating < 1 || rating > 5) {
+            throw new Exception("Rating out of range");
+        }
+
         Review review = new Review(rating, content, subscriptionBoxId, userId);
         reviewRepository.save(review);
         return review;
@@ -39,6 +61,8 @@ public class ReviewService {
     }
 
     public List<Review> getSubsboxReview(String subscriptionBoxId, String state) throws Exception {
+        if (!subsboxExist(subscriptionBoxId)) throw new Exception();
+
         if (state == null) {
             return reviewRepository.findByIdSubsbox(subscriptionBoxId);
         } else {
