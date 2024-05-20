@@ -1,5 +1,6 @@
 package snackscription.review.controller;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +16,15 @@ import snackscription.review.model.ReviewState;
 import snackscription.review.service.ReviewService;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,7 +51,6 @@ public class ReviewAdminControllerTest {
         Review review4 = new Review(3, "It's okay", "subsbox_124", "user_125");
         Review review5 = new Review(4, "I like it", "subsbox_124", "user_126");
 
-        review1.setState(ReviewState.PENDING);
         review4.setState(ReviewState.APPROVED);
         review5.setState(ReviewState.REJECTED);
 
@@ -96,5 +100,50 @@ public class ReviewAdminControllerTest {
                 .andExpect(jsonPath("$.state", is("REJECTED")));
 
         verify(reviewService).rejectReview(review.getSubsbox(), review.getAuthor());
+    }
+
+    @Test
+    public void testGetAllPendingReview() throws Exception {
+         List<Review> pendingReviews = new ArrayList<>();
+         String subsboxId = "subsbox_124";
+
+         for (Review review : reviews) {
+             if (review.getSubsbox().equals(subsboxId) && review.getState().equals(ReviewState.PENDING)) pendingReviews.add(review);
+         }
+
+         when(reviewService.getSubsboxReview(subsboxId, ReviewState.PENDING.toString())).thenReturn(pendingReviews);
+
+         String result = mockMvc.perform(
+                 get(BASE_URL + "/subscription-boxes/{subsboxId}/reviews?state=PENDING", subsboxId))
+                 .andExpect(status().isOk())
+                 .andExpect(jsonPath("$", hasSize(pendingReviews.size())))
+                 .andReturn().getResponse().getContentAsString();
+
+        List<Review> foundReviews = new ArrayList<Review>();
+        for (int i=0; i<pendingReviews.size(); i++) {
+            String prefixMatcher = String.format("$[%d]", i);
+            int rating = JsonPath.read(result, prefixMatcher + ".rating");
+            String content = JsonPath.read(result, prefixMatcher + ".content");
+            String author = JsonPath.read(result, prefixMatcher + ".author");
+            String curSubscriptionBoxId = JsonPath.read(result, prefixMatcher + ".subsbox");
+
+            Review review = new Review(rating, content, curSubscriptionBoxId, author);
+            foundReviews.add(review);
+        }
+
+        Comparator<Review> cmp = Comparator.comparing(Review::getAuthor);
+        pendingReviews.sort(cmp);
+        foundReviews.sort(cmp);
+
+        for (int i=0; i<pendingReviews.size(); i++) {
+            assertEquals(pendingReviews.get(i).getRating(), foundReviews.get(i).getRating());
+            assertEquals(pendingReviews.get(i).getContent(), foundReviews.get(i).getContent());
+            assertEquals(pendingReviews.get(i).getAuthor(), foundReviews.get(i).getAuthor());
+            assertEquals(pendingReviews.get(i).getSubsbox(), foundReviews.get(i).getSubsbox());
+            assertEquals(pendingReviews.get(i).getState(), foundReviews.get(i).getState());
+        }
+
+        verify(reviewService).getSubsboxReview(subsboxId,  ReviewState.PENDING.toString());
+
     }
 }
