@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import snackscription.review.model.Review;
 import snackscription.review.model.ReviewState;
-import snackscription.review.service.ReviewService;
+import snackscription.review.service.ReviewServiceImpl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ReviewAdminController.class)
 public class ReviewAdminControllerTest {
     @MockBean
-    ReviewService reviewService; 
+    ReviewServiceImpl reviewService; 
 
     @Autowired
     MockMvc mockMvc;

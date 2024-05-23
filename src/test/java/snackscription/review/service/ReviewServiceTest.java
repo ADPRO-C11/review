@@ -34,7 +34,7 @@ public class ReviewServiceTest {
 
     @BeforeEach
     public void setUp() {
-        reviewService = new ReviewService(reviewRepo);
+        reviewService = new ReviewServiceImpl(reviewRepo);
 
         Review review1 = new Review(5, "I love it", "subsbox_123", "user_123");
         Review review2 = new Review(1, "I hate it", "subsbox_123", "user_124");

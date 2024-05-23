@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import snackscription.review.model.Review;
-import snackscription.review.service.ReviewService;
+import snackscription.review.service.ReviewServiceImpl;
 
 import java.util.List;
 
@@ -12,9 +12,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 public class ReviewAdminController {
-    private ReviewService reviewService;
+    private ReviewServiceImpl reviewService;
 
-    public ReviewAdminController(ReviewService reviewService) {
+    public ReviewAdminController(ReviewServiceImpl reviewService) {
         this.reviewService = reviewService;
     }
 

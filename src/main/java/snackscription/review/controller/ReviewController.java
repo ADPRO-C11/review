@@ -3,21 +3,20 @@ package snackscription.review.controller;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import snackscription.review.model.Review;
-import snackscription.review.service.ReviewService;
+import snackscription.review.service.ReviewServiceImpl;
 
 @CrossOrigin
 @RestController
 @RequestMapping("")
 public class ReviewController {
-    private ReviewService reviewService;
+    private ReviewServiceImpl reviewService;
 
-    public ReviewController(ReviewService reviewService) {
+    public ReviewController(ReviewServiceImpl reviewService) {
         this.reviewService = reviewService;
     }
 
