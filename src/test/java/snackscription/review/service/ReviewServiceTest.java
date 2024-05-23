@@ -1,7 +1,7 @@
 package snackscription.review.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import snackscription.review.exception.ReviewNotFoundException;
 import snackscription.review.model.Review;
-import snackscription.review.model.ReviewId;
 import snackscription.review.model.ReviewState;
 import snackscription.review.repository.ReviewRepository;
 
@@ -54,11 +53,11 @@ public class ReviewServiceTest {
         reviews.add(review5);
     }
 
-    @Test
-    public void getReviewsBySubscriptionBoxId() throws Exception {
-        List<Review> curReviews = new ArrayList<>();
 
+    @Test
+    public void testGetSubsboxReview() throws Exception {
         String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
+        List<Review> curReviews = new ArrayList<>();
         for (Review review : this.reviews) {
             if (review.getSubsbox().equals(subscriptionBoxId)) {
                 curReviews.add(review);
@@ -75,8 +74,38 @@ public class ReviewServiceTest {
     }
 
     @Test
-    public void getReviewBySubsboxIdNotFound() throws Exception {
+    public void testGetSubsboxReviewNotFound() throws Exception {
+        String subscriptionBoxId = "nonexistent_subsbox_id";
 
+        when(reviewRepo.findByIdSubsbox(subscriptionBoxId)).thenReturn(null);
+
+        List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, null);
+
+        assertNotNull(foundReviews);
+        assertEquals(0, foundReviews.size());
+
+        verify(reviewRepo).findByIdSubsbox(subscriptionBoxId);
+    }
+
+    @Test
+    public void testGetSubsboxReviewApproved() throws Exception {
+        String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
+
+        List <Review> cuReviews = new ArrayList<>();
+
+        for (Review review : this.reviews) {
+            if (review.getSubsbox().equals(subscriptionBoxId) && review.getState().equals(ReviewState.APPROVED)) {
+                cuReviews.add(review);
+            }
+        }
+
+        when(reviewRepo.findByIdSubsboxAndState(subscriptionBoxId, ReviewState.APPROVED)).thenReturn(cuReviews);
+
+        List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, "APPROVED");
+
+        assertEquals(cuReviews, foundReviews);
+
+        verify(reviewRepo).findByIdSubsboxAndState(subscriptionBoxId, ReviewState.APPROVED);
     }
 
     @Test
@@ -97,16 +126,6 @@ public class ReviewServiceTest {
     }
 
     @Test
-    public void testCreateReviewUserNotFound() throws Exception {
-
-    }
-
-    @Test
-    public void testCreateReviewSubsboxNotFound() throws Exception {
-
-    }
-
-    @Test
     public void testCreateReviewAlreadyExist() throws Exception {
         Review review = reviews.get(0);
         when(reviewRepo.existsById(review.getId())).thenReturn(true);
@@ -124,48 +143,6 @@ public class ReviewServiceTest {
         assertThrows(Exception.class, () -> {
             reviewService.createReview(-1, review.getContent(), review.getSubsbox(), review.getAuthor());
         });
-    }
-
-    @Test
-    public void testGetSubsboxReview() throws Exception {
-        String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
-
-        List<Review> curReviews = new ArrayList<>();
-
-        for (Review review : this.reviews) {
-            if (review.getSubsbox().equals(subscriptionBoxId)) {
-                curReviews.add(review);
-            }
-        }
-
-        when(reviewRepo.findByIdSubsbox(subscriptionBoxId)).thenReturn(curReviews);
-
-        List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, null);
-
-        assertEquals(curReviews, foundReviews);
-
-        verify(reviewRepo).findByIdSubsbox(subscriptionBoxId);
-    }
-
-    @Test
-    public void testgetSubsboxReviewApproved() throws Exception {
-        String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
-
-        List <Review> cuReviews = new ArrayList<>();
-
-        for (Review review : this.reviews) {
-            if (review.getSubsbox().equals(subscriptionBoxId) && review.getState().equals(ReviewState.APPROVED)) {
-                cuReviews.add(review);
-            }
-        }
-
-        when(reviewRepo.findByIdSubsboxAndState(subscriptionBoxId, ReviewState.APPROVED)).thenReturn(cuReviews);
-
-        List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, "APPROVED");
-
-        assertEquals(cuReviews, foundReviews);
-
-        verify(reviewRepo).findByIdSubsboxAndState(subscriptionBoxId, ReviewState.APPROVED);
     }
 
     @Test
@@ -202,7 +179,7 @@ public class ReviewServiceTest {
         Review newReview = new Review(newRating, newContent, author, subsbox);
         newReview.setId(review.getId());
 
-        when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(review);
+        when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(null);
         when(reviewRepo.save(any(Review.class))).thenReturn(newReview);
 
         Review editedReview = reviewService.editReview(newRating, newContent, subsbox, author);
@@ -237,7 +214,7 @@ public class ReviewServiceTest {
 
         Review review = reviews.getFirst();
 
-        when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(review);
+        when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(null);
 
         reviewService.deleteReview(subsbox, author);
 
