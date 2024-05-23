@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import snackscription.review.model.Review;
 import snackscription.review.service.ReviewService;
 
+@CrossOrigin
 @RestController
 @RequestMapping("")
 public class ReviewController {
@@ -39,7 +40,7 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("/subscription-boxes/{subsbox}/public")
+    @GetMapping("/subscription-boxes/{subsbox}")
     public ResponseEntity<List<Review>> getPublicSubsboxReview(@PathVariable String subsbox) {
         try {
             List<Review> reviews = reviewService.getSubsboxReview(subsbox, "APPROVED");
@@ -93,10 +94,5 @@ public class ReviewController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-    }
-
-    @GetMapping("/subscription-boxes/{subsbox}")
-    public List<Review> getSubsboxReview(@PathVariable String subsbox) throws Exception {
-        return reviewService.getSubsboxReview(subsbox, null); 
     }
 }

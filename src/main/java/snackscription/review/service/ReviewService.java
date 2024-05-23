@@ -53,7 +53,7 @@ public class ReviewService {
     }
 
     public Review getReview(String subsbox, String user) throws Exception {
-        Optional<Review> oreview = reviewRepository.findById(new ReviewId(user, subsbox));
+        Optional<Review> oreview = reviewRepository.findById(new ReviewId(subsbox, user));
         if (oreview.isEmpty()) {
             throw new ReviewNotFoundException();
         }

@@ -8,6 +8,7 @@ import snackscription.review.service.ReviewService;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/admin")
 public class ReviewAdminController {
