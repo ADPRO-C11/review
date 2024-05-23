@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import snackscription.review.exception.InvalidStateException;
 import snackscription.review.exception.ReviewNotFoundException;
 import snackscription.review.model.Review;
 import snackscription.review.model.ReviewState;
@@ -109,6 +110,15 @@ public class ReviewServiceTest {
     }
 
     @Test
+    public void testGetSubsboxReviewInvalidState() throws Exception {
+        String subscriptionBoxId = this.reviews.getFirst().getSubsbox(); 
+
+        assertThrows(InvalidStateException.class, () -> {
+            reviewService.getSubsboxReview(subscriptionBoxId, "INVALID_STATE"); 
+        }); 
+    }
+
+    @Test
     public void testCreateReview() throws Exception {
         Review review = reviews.getFirst();
 
@@ -180,15 +190,10 @@ public class ReviewServiceTest {
         newReview.setId(review.getId());
 
         when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(null);
-        when(reviewRepo.save(any(Review.class))).thenReturn(newReview);
 
-        Review editedReview = reviewService.editReview(newRating, newContent, subsbox, author);
-
-        assertEquals(newRating, editedReview.getRating());
-        assertEquals(newContent, editedReview.getContent());
-        assertEquals(subsbox, editedReview.getSubsbox());
-        assertEquals(author, editedReview.getAuthor());
-        assertEquals(review.getId(), editedReview.getId());
+        assertThrows(ReviewNotFoundException.class, () -> {
+            reviewService.editReview(newRating, newContent, subsbox, author);
+        }); 
     }
 
     @Test
@@ -216,11 +221,7 @@ public class ReviewServiceTest {
 
         when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(null);
 
-        reviewService.deleteReview(subsbox, author);
-
-        assertThrows(ReviewNotFoundException.class, () -> reviewService.getReview(subsbox, author));
-
-        verify(reviewRepo).delete(review);
+        assertThrows(ReviewNotFoundException.class, () -> reviewService.deleteReview(subsbox, author));
     }
 
     public void assertEqualReview(Review review1, Review review2) {

@@ -1,5 +1,6 @@
 package snackscription.review.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,16 +29,6 @@ public class ReviewService {
         return reviewRepository.existsById(new ReviewId(subsbox, user));
     }
 
-    public boolean subsboxExist(String subsbox) {
-        //TODO: connect to subsbox service
-        return true;
-    }
-
-    public  boolean userExist(String user) {
-        //TODO: connect to user service
-        return true;
-    }
-
     public Review createReview(int rating, String content, String subscriptionBoxId, String userId) throws Exception {
         if (reviewExist(subscriptionBoxId, userId)) {
             throw new Exception("User has made a review for this subscription box.");
@@ -61,18 +52,22 @@ public class ReviewService {
     }
 
     public List<Review> getSubsboxReview(String subscriptionBoxId, String state) throws Exception {
-        if (!subsboxExist(subscriptionBoxId)) throw new Exception();
-
+        List<Review> result;
         if (state == null) {
-            return reviewRepository.findByIdSubsbox(subscriptionBoxId);
+            result = reviewRepository.findByIdSubsbox(subscriptionBoxId);
         } else {
             state = state.toUpperCase();
-            ReviewState reviewState = Enum.valueOf(ReviewState.class, state);
-            if (reviewState == null) {
+            if (!state.equals("PENDING") && !state.equals("APPROVED") && !state.equals("REJECTED")) {
                 throw new InvalidStateException();
             }
-            return reviewRepository.findByIdSubsboxAndState(subscriptionBoxId, reviewState);
-        }        
+            ReviewState reviewState = ReviewState.valueOf(state);
+            result = reviewRepository.findByIdSubsboxAndState(subscriptionBoxId, reviewState);
+        }
+                
+        if (result == null) {
+            result = new ArrayList<>();
+        }
+        return result; 
     }
 
     public Review editReview(int rating, String content, String subscriptionBoxId, String userId) throws Exception {
