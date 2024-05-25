@@ -55,8 +55,6 @@ public class ReviewServiceTest {
 
     @Test
     public void getReviewsBySubscriptionBoxId() throws Exception {
-        ReviewService reviewService = new ReviewService(reviewRepo);
-
         List<Review> curReviews = new ArrayList<>();
 
         String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
