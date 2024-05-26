@@ -1,8 +1,9 @@
-name: SonarCloud
+name: Build, Test, and Analyze with SonarCloud
 
 on:
   push:
     branches:
+      - dev
       - staging
       - main
 
