@@ -62,15 +62,16 @@ public class ReviewServiceTest {
     public void testGetSubsboxReview() throws Exception {
         String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
         List<Review> curReviews = new ArrayList<>();
-        for (Review review : this.reviews) {
+        for (Review review : this.reviews) {            
             if (review.getSubsbox().equals(subscriptionBoxId)) {
                 curReviews.add(review);
             }
         }
 
         when(reviewRepo.findByIdSubsbox(subscriptionBoxId)).thenReturn(curReviews);
+        when(reviewRepo.findByIdSubsbox(subscriptionBoxId)).thenReturn(curReviews);
 
-        List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, null);
+        List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, null);        
 
         assertEquals(curReviews, foundReviews);
 
@@ -131,7 +132,7 @@ public class ReviewServiceTest {
                 review.getRating(),
                 review.getContent(),
                 review.getSubsbox(),
-                review.getAuthor());
+                review.getAuthor()); 
 
         assertEqualReview(review, savedReview);
 
@@ -166,16 +167,19 @@ public class ReviewServiceTest {
         
         int newRating = 1;
         String newContent = "Changed content";
-        Review newReview = new Review(newRating, newContent, author, subsbox);
+        Review newReview = new Review(newRating, newContent, author, subsbox);        
         newReview.setId(review.getId());
 
         when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(review);
+        when(reviewRepo.findByIdSubsboxAndIdAuthor(subsbox, author)).thenReturn(review);
         when(reviewRepo.save(any(Review.class))).thenReturn(newReview);
         
-        Review editedReview = reviewService.editReview(newRating, newContent, subsbox, author);
+        Review editedReview = reviewService.editReview(newRating, newContent, subsbox, author);        
 
         assertEquals(newRating, editedReview.getRating());
         assertEquals(newContent, editedReview.getContent());
+        assertEquals(subsbox, editedReview.getSubsbox());
+        assertEquals(author, editedReview.getAuthor());
         assertEquals(subsbox, editedReview.getSubsbox());
         assertEquals(author, editedReview.getAuthor());
         assertEquals(review.getId(), editedReview.getId());
@@ -202,7 +206,7 @@ public class ReviewServiceTest {
     @Test
     public void testDeleteReview() throws Exception {
         String subsbox = this.reviews.getFirst().getSubsbox();
-        String author = this.reviews.getFirst().getAuthor();
+        String author = this.reviews.getFirst().getAuthor();        
 
         Review review = reviews.getFirst();
 
