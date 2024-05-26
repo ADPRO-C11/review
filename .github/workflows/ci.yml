@@ -3,7 +3,14 @@ name: Java CI Pipeline
 on:
   push:
     branches:
-      - "**"
+      - main
+      - staging 
+      - dev
+  pull_request:
+    branches:
+      - main
+      - staging 
+      - dev 
   workflow_dispatch:
 
 jobs:
@@ -28,8 +35,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
       - name: Build with Gradle
         run: |
           ./gradlew assemble
@@ -85,3 +94,8 @@ jobs:
         env:
           PRODUCTION: test
         # (Optional) Add steps for generating coverage report and other post-test tasks
+      - name: SonarCloud Scan
+        env: 
+          CI_BRANCH: ${{ github.ref_name }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN 
