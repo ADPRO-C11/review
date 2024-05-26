@@ -42,7 +42,6 @@ sonar {
     property("sonar.projectKey","ADPRO-C11_snackscription-review")
     property("sonar.organization", "adpro-c11") 
     property("sonar.host.url", "https://sonarcloud.io")
-	property("sonar.branch.name", System.getenv("CI_BRANCH") ?: 'main')
   }
 }
 

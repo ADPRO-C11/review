@@ -96,6 +96,5 @@ jobs:
         # (Optional) Add steps for generating coverage report and other post-test tasks
       - name: SonarCloud Scan
         env: 
-          CI_BRANCH: ${{ github.ref_name }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN 
