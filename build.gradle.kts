@@ -3,6 +3,7 @@ plugins {
 	jacoco
 	id("org.springframework.boot") version "3.2.5"
 	id("io.spring.dependency-management") version "1.1.4"
+	id("org.sonarqube") version "5.0.0.4638"
 }
 
 group = "snackscription"
@@ -34,6 +35,14 @@ dependencies {
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+sonar {
+  properties {
+    property("sonar.projectKey","ADPRO-C11_snackscription-review")
+    property("sonar.organization", "adpro-c11") 
+    property("sonar.host.url", "https://sonarcloud.io")
+  }
 }
 
 tasks.register<Test>("unitTest") {
@@ -74,6 +83,6 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required.set(true)
 		csv.required.set(true)
-		// html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
 	}
 }
