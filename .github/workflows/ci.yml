@@ -5,41 +5,41 @@ on:
   pull_request: 
 
 jobs:
-  # build:
-  #   name: Build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v4
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-  #     - name: Set up JDK 21
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         distribution: "temurin"
-  #         java-version: "21"
-  #         cache: "gradle"
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
 
-  #     - name: Cache Gradle dependencies
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: ~/.gradle/caches
-  #         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-gradle-
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
-  #     - name: Make gradlew executable
-  #       run: chmod +x ./gradlew
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
-  #     - name: Build with Gradle
-  #       run: |
-  #         ./gradlew assemble
-  #     # (Optional) Add steps for running tests and generating reports
+      - name: Build with Gradle
+        run: |
+          ./gradlew assemble
+      # (Optional) Add steps for running tests and generating reports
 
-  #     - name: Upload Artifact
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: java-app
-  #         path: build/libs/*.jar             
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-app
+          path: build/libs/*.jar             
 
   test:
     name: Test
