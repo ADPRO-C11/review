@@ -17,6 +17,10 @@ import snackscription.review.service.ReviewServiceImpl;
 public class ReviewController {
     private ReviewService reviewService;
 
+    public static final String BODY_AUTHOR = "author";
+    public static final String BODY_CONTENT = "content";
+    public static final String BODY_RATING = "rating";
+
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
@@ -29,9 +33,9 @@ public class ReviewController {
     @PostMapping("/subscription-boxes/{subsbox}/users/self")
     public ResponseEntity<Review> createSelfSubsboxReview(@RequestBody Map<String,String> body, @PathVariable String subsbox) {
         try {
-            String author = body.get("author");
-            int rating = Integer.parseInt(body.get("rating"));
-            String content = body.get("content");
+            String author = body.get(BODY_AUTHOR);
+            int rating = Integer.parseInt(body.get(BODY_RATING));
+            String content = body.get(BODY_CONTENT);
 
             Review review = reviewService.createReview(rating, content, subsbox, author);
             return new ResponseEntity<>(review, HttpStatus.CREATED);
