@@ -1,38 +1,23 @@
 package snackscription.review.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.catalina.connector.Response;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.ServerProperties.Tomcat.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import snackscription.review.model.Review;
-import snackscription.review.repository.ReviewRepository;
 import snackscription.review.service.ReviewService;
 
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-
-
-
-
 @RestController
-@RequestMapping("/")
+@RequestMapping("/reviews")
 public class ReviewController {
-
-
     private ReviewService reviewService;
+
+    public static final String BODY_AUTHOR = "author";
+    public static final String BODY_CONTENT = "content";
+    public static final String BODY_RATING = "rating";
 
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
@@ -43,101 +28,95 @@ public class ReviewController {
         return ResponseEntity.ok().body("Welcome to the review service!");
     }
 
-    @PostMapping("/api/subscription-boxes/{subscriptionBoxId}")
-    public ResponseEntity<Review> createSubscriptionBoxReview(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
-        
+    @PostMapping("/subscription-boxes/{subsbox}")
+    public ResponseEntity<Review> createSubsboxReview(@RequestBody Map<String,String> body, @PathVariable String subsbox) {
         try {
-            String userId = body.get("userId");
-            int rating = Integer.parseInt(body.get("rating"));
-            String content = body.get("content");
+            String author = body.get(BODY_AUTHOR);
+            int rating = Integer.parseInt(body.get(BODY_RATING));
+            String content = body.get(BODY_CONTENT);
 
-            Review review = reviewService.createReview(rating, content, subscriptionBoxId, userId);
+            Review review = reviewService.createReview(rating, content, subsbox, author);
             return new ResponseEntity<>(review, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping("/api/subscription-boxes/{subscriptionBoxId}")
-    public ResponseEntity<List<Review>> getAllPublicSubscriptionBoxReview(@PathVariable String subscriptionBoxId) {
+    @GetMapping("/subscription-boxes/{subsbox}/public")
+    public ResponseEntity<List<Review>> getPublicSubsboxReview(@PathVariable String subsbox) {
         try {
-            List<Review> reviews = reviewService.getAllSubscriptionBoxReview(subscriptionBoxId, "APPROVED");
+            List<Review> reviews = reviewService.getSubsboxReview(subsbox, "APPROVED");
             return new ResponseEntity<>(reviews, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping("/api/subscription-boxes/{subscriptionBoxId}/users/self")
-    public ResponseEntity<Review> getSelfSubscriptionBoxReview(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
+    @GetMapping("/subscription-boxes/{subsbox}/users/{user}")
+    public ResponseEntity<Review> getSelfSubsboxReview(@RequestBody Map<String,String> body, @PathVariable String subsbox, @PathVariable String user) {
         try {
-            String userId = body.get("userId");
-            Review review = reviewService.getReview(subscriptionBoxId, userId);
+            String sender = body.get(BODY_AUTHOR); 
+            if (!authenticate(sender, user)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            Review review = reviewService.getReview(subsbox, user);
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/api/subscription-boxes/{subscriptionBoxId}/users/self")
-    public ResponseEntity<Review> editSelfSubscriptionBoxId(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
+    @PutMapping("/subscription-boxes/{subsbox}/users/{user}")
+    public ResponseEntity<Review> editReview(@RequestBody Map<String,String> body, @PathVariable String subsbox, @PathVariable String user) {
         try {
-            String userId = body.get("userId");
-            int rating = Integer.parseInt(body.get("rating"));
-            String content = body.get("content");
+            String sender = body.get(BODY_AUTHOR);
+            if (!authenticate(sender, user)) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
 
-            Review review = reviewService.editReview(rating, content, subscriptionBoxId, userId);
+            int rating = Integer.parseInt(body.get(BODY_RATING));
+            String content = body.get(BODY_CONTENT);
+
+            Review review = reviewService.editReview(rating, content, subsbox, user);
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
    }
 
-    @DeleteMapping("/api/subscription-boxes/{subscriptionBoxId}/users/self")
-    public ResponseEntity<Review> deleteSelfSubscriptionBoxReview(@RequestBody Map<String,String> body, @PathVariable String subscriptionBoxId) {
+    private boolean authenticate(String sender, String user) {
+        return true;  
+    }
+
+    @DeleteMapping("/subscription-boxes/{subsbox}/users/{user}")
+    public ResponseEntity<Review> deleteReview(@PathVariable String subsbox, @PathVariable String user) {
         try {
-            String userId = body.get("userId");
-            reviewService.deleteReview(subscriptionBoxId, userId);
+            reviewService.deleteReview(subsbox, user);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @DeleteMapping("/api/subscription-boxes/{subscriptionBoxId}/users/{userId}")
-    public ResponseEntity<Review> deleteSubscriptionBoxReview(@PathVariable String subscriptionBoxId, @PathVariable String userId) {
+    @GetMapping("/subscription-boxes/{subsbox}")
+    public List<Review> getSubsboxReview(@PathVariable String subsbox) throws Exception {
+        return reviewService.getSubsboxReview(subsbox, null); 
+    }
+
+    @PutMapping("/subscription-boxes/{subsbox}/users/{user}/approve")
+    public ResponseEntity<Review> approveReview(@PathVariable String subsbox, @PathVariable String user) {
         try {
-            reviewService.deleteReview(subscriptionBoxId, userId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    @GetMapping("/api/reviews/{subsboxId}")
-    public List<Review> getBySubscriptionBoxId(@PathVariable String subsboxId) throws Exception {
-        return reviewService.getAllSubscriptionBoxReview(subsboxId, null); 
-    }
-
-    @GetMapping("/api/reviews/{reviewId}")
-    public Review getById(@PathVariable String reviewId) throws Exception {
-        return reviewService.findById(reviewId); 
-    }
-
-    @PutMapping("/api/reviews/{reviewId}/approve")
-    public ResponseEntity<Review> approveReview(@PathVariable String reviewId) {
-        try {
-            Review review = reviewService.approveReview(reviewId);
+            Review review = reviewService.approveReview(subsbox, user);
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/api/reviews/{reviewId}/reject")
-    public ResponseEntity<Review> rejectReview(@PathVariable String reviewId) {
+    @PutMapping("/subscription-boxes/{subsbox}/users/{user}/reject")
+    public ResponseEntity<Review> rejectReview(@PathVariable String subsbox, @PathVariable String user) {
         try {
-            Review review = reviewService.rejectReview(reviewId);
+            Review review = reviewService.rejectReview(subsbox, user);
             return new ResponseEntity<>(review, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
