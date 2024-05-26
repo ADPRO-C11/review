@@ -31,9 +31,7 @@ name: SonarCloud analysis
 on:
   push:
     branches: 
-      - main
-      - dev
-      - staging
+      - "**"
 
 permissions:
   pull-requests: read # allows SonarCloud to decorate PRs with analysis results

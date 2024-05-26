@@ -1,8 +1,10 @@
 name: Java CI Pipeline
 
 on:
-  push:
   pull_request: 
+    - dev
+    - staging 
+    - main
 
 jobs:
   build:
