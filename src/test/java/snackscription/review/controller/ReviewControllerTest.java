@@ -19,7 +19,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.hamcrest.Matchers.hasSize;
@@ -69,48 +72,48 @@ public class ReviewControllerTest {
 
         when(reviewService.createReview(review.getRating(), review.getContent(), review.getId().getSubsbox(), review.getId().getAuthor())).thenReturn(review);
         
-        ResultActions result = mockMvc.perform(post("/reviews/subscription-boxes/{subsbox}", review.getSubsbox())
+        ResultActions result = mockMvc.perform(post("/subscription-boxes/{subsbox}/users/self", review.getSubsbox())
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{\"rating\": 5, \"content\": \"I love it\", \"author\": \"user_123\"}"))
+            .content("{\"rating\": 5, \"content\": \"I love it\", \"author\": \"user_123\"}"))            
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.rating", is(5)))
             .andExpect(jsonPath("$.content", is("I love it")))
             .andExpect(jsonPath("$.author", is("user_123")))
-            .andExpect(jsonPath("$.subsbox", is("subsbox_123")));
+            .andExpect(jsonPath("$.subsbox", is("subsbox_123")));            
 
-        verify(reviewService).createReview(review.getRating(), review.getContent(), review.getSubsbox(), review.getAuthor());
+        verify(reviewService).createReview(review.getRating(), review.getContent(), review.getSubsbox(), review.getAuthor());        
     }
 
     @Test 
-    public void testReadAllPublicSubscriptionBoxReview() throws Exception {
+    public void testReadAllPublicSubsboxReviews() throws Exception {
         List<Review> approvedReviews = new ArrayList<>();
         String subsbox = "subsbox_124";
-        for (Review review : reviews) {
+        for (Review review : reviews) {           
             if (review.getSubsbox().equals(subsbox) && review.getState().equals(ReviewState.APPROVED)) {
                 approvedReviews.add(review);
             }
         }
 
-        when(reviewService.getSubsboxReview(subsbox, "APPROVED")).thenReturn(approvedReviews);
+        when(reviewService.getSubsboxReview(subsbox, "APPROVED")).thenReturn(approvedReviews);       
 
-        String result = mockMvc.perform(get("/reviews/subscription-boxes/{subsbox}/public", subsbox))
+        String result = mockMvc.perform(get("/subscription-boxes/{subsbox}", subsbox))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$", hasSize(approvedReviews.size())))
                .andReturn()
                .getResponse()
                .getContentAsString();
 
-      List<Review> foundReviews = new ArrayList<Review>();
-       for (int i=0; i<approvedReviews.size(); i++) {
-           String prefixMatcher = String.format("$[%d]", i);
-           int rating = JsonPath.read(result, prefixMatcher + ".rating");
-           String content = JsonPath.read(result, prefixMatcher + ".content");
-           String author = JsonPath.read(result, prefixMatcher + ".author");
-           String curSubscriptionBoxId = JsonPath.read(result, prefixMatcher + ".subsbox");
-
-           Review review = new Review(rating, content, curSubscriptionBoxId, author);
-           foundReviews.add(review);
-       }
+        List<Review> foundReviews = new ArrayList<Review>();
+        for (int i=0; i<approvedReviews.size(); i++) {
+            String prefixMatcher = String.format("$[%d]", i);
+            int rating = JsonPath.read(result, prefixMatcher + ".rating");
+            String content = JsonPath.read(result, prefixMatcher + ".content");
+            String author = JsonPath.read(result, prefixMatcher + ".author");
+            String curSubscriptionBoxId = JsonPath.read(result, prefixMatcher + ".subsbox");
+            
+            Review review = new Review(rating, content, curSubscriptionBoxId, author);
+            foundReviews.add(review);
+        }
 
        Comparator<Review> cmp = Comparator.comparing(Review::getAuthor);
        approvedReviews.sort(cmp);
@@ -120,21 +123,21 @@ public class ReviewControllerTest {
            assertEquals(approvedReviews.get(i).getRating(), foundReviews.get(i).getRating());
            assertEquals(approvedReviews.get(i).getContent(), foundReviews.get(i).getContent());
            assertEquals(approvedReviews.get(i).getAuthor(), foundReviews.get(i).getAuthor());
-           assertEquals(approvedReviews.get(i).getSubsbox(), foundReviews.get(i).getSubsbox());
+           assertEquals(approvedReviews.get(i).getSubsbox(), foundReviews.get(i).getSubsbox());           
        }
 
-       verify(reviewService).getSubsboxReview(subsbox, "APPROVED");
+       verify(reviewService).getSubsboxReview(subsbox, "APPROVED");       
     }
 
     @Test 
-    public void readSelfSubscriptionBoxReview() throws Exception {
+    public void testReadSelfSubsboxReview() throws Exception {
         Review review = reviews.getFirst(); 
         String subsbox = review.getSubsbox();
         String author = review.getAuthor();
 
-        when(reviewService.getReview(subsbox, author)).thenReturn(review);
+        when(reviewService.getReview(subsbox, author)).thenReturn(review);       
 
-        ResultActions result = mockMvc.perform(get("/reviews/subscription-boxes/{subscriptionBoxId}/users/{author}", subsbox, author)
+        ResultActions result = mockMvc.perform(get("/subscription-boxes/{subscriptionBoxId}/users/self", subsbox, author)
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"author\": \"user_123\"}"))
             .andExpect(status().isOk())
@@ -146,58 +149,42 @@ public class ReviewControllerTest {
         verify(reviewService).getReview(subsbox, author);
     }
 
+    @Test
+    public void testEditSelfSubsboxReview() throws Exception {
+        Review review = reviews.getFirst();
+        String subsboxId = review.getSubsbox();
+        String userId = review.getAuthor();
+
+        int newRating = 4;
+        String newContent = "Awikwok";
+        when(reviewService.editReview(newRating, newContent, subsboxId, userId)).thenReturn(new Review(newRating, newContent, subsboxId, userId));
+
+        ResultActions result = mockMvc.perform(put("/subscription-boxes/{subscriptionBoxId}/users/self", subsboxId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"rating\": 4, \"content\": \"Awikwok\", \"author\": \"user_123\"}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.rating", is(newRating)))
+            .andExpect(jsonPath("$.content", is(newContent)))
+            .andExpect(jsonPath("$.author", is(review.getAuthor())))
+            .andExpect(jsonPath("$.subsbox", is(review.getSubsbox())));
+
+        verify(reviewService).editReview(newRating, newContent, subsboxId, userId);
+    }
+
     @Test 
-    public void testDeleteUserSubscriptionBoxReview() throws Exception {
+    public void testDeleteSelfSubsboxReview() throws Exception {
         Review review = reviews.getFirst();
         String subsbox = review.getSubsbox();
         String author = review.getAuthor();
 
         doNothing().when(reviewService).deleteReview(subsbox, author);
+        doNothing().when(reviewService).deleteReview(subsbox, author);
 
-        ResultActions result = mockMvc.perform(delete("/reviews/subscription-boxes/{subsbox}/users/{author}", subsbox, author)
-                .contentType(MediaType.APPLICATION_JSON))
+        ResultActions result = mockMvc.perform(delete("/subscription-boxes/{subsbox}/users/self", subsbox)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"author\": \"user_123\"}"))
                 .andExpect(status().isNoContent());
 
         verify(reviewService).deleteReview(subsbox, author);
-    }
-
-    @Test
-    public void testApproveReview() throws Exception {
-        Review review = reviews.getFirst();
-
-        Review approvedReview = new Review(review.getRating(), review.getContent(), review.getSubsbox(), review.getAuthor());
-        approvedReview.setState(ReviewState.APPROVED);
-
-        when(reviewService.approveReview(review.getSubsbox(), review.getAuthor())).thenReturn(approvedReview);
-        
-        ResultActions result = mockMvc.perform(put("/reviews/subscription-boxes/{subsbox}/users/{author}/approve", review.getSubsbox(), review.getAuthor()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.rating", is(review.getRating())))
-            .andExpect(jsonPath("$.content", is(review.getContent())))
-            .andExpect(jsonPath("$.author", is(review.getAuthor())))
-            .andExpect(jsonPath("$.subsbox", is(review.getSubsbox())))
-            .andExpect(jsonPath("$.state", is("APPROVED")));
-
-        verify(reviewService).approveReview(review.getSubsbox(), review.getAuthor());
-    }
-
-    @Test 
-    public void testRejectReview() throws Exception {
-        Review review = reviews.getFirst();
-
-        Review approvedReview = new Review(review.getRating(), review.getContent(), review.getSubsbox(), review.getAuthor());
-        approvedReview.setState(ReviewState.REJECTED);
-
-        when(reviewService.approveReview(review.getSubsbox(), review.getAuthor())).thenReturn(approvedReview);
-
-        ResultActions result = mockMvc.perform(put("/reviews/subscription-boxes/{subsbox}/users/{author}/approve", review.getSubsbox(), review.getAuthor()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.rating", is(review.getRating())))
-                .andExpect(jsonPath("$.content", is(review.getContent())))
-                .andExpect(jsonPath("$.author", is(review.getAuthor())))
-                .andExpect(jsonPath("$.subsbox", is(review.getSubsbox())))
-                .andExpect(jsonPath("$.state", is("REJECTED")));
-
-        verify(reviewService).approveReview(review.getSubsbox(), review.getAuthor());
     }
 }
