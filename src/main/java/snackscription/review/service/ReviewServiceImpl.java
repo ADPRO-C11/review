@@ -3,9 +3,11 @@ package snackscription.review.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +22,11 @@ import snackscription.review.repository.ReviewRepository;
 @Component
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
+    private final SentimentAnalysisService sentimentAnalysisService;
 
-    public ReviewServiceImpl (ReviewRepository reviewRepository) {
+    public ReviewServiceImpl (ReviewRepository reviewRepository, SentimentAnalysisService sentimentAnalysisService) {
         this.reviewRepository = reviewRepository;
+        this.sentimentAnalysisService = sentimentAnalysisService;
     }
 
     public boolean reviewExist(String subsbox, String user) {
@@ -103,5 +107,11 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         reviewRepository.delete(review);
+    }
+
+    @Async
+    public CompletableFuture<String> analyzeSentimentAsync(String reviewText) {
+        String sentiment = sentimentAnalysisService.analyze(reviewText);
+        return CompletableFuture.completedFuture(sentiment);
     }
 }

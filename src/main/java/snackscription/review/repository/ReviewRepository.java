@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import io.micrometer.common.lang.Nullable;
 import snackscription.review.model.Review;
 import snackscription.review.model.ReviewId;
+import snackscription.review.model.ReviewId;
 import snackscription.review.model.ReviewState;
 
 public interface ReviewRepository extends JpaRepository<Review, ReviewId> {
