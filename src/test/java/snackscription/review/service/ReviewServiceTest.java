@@ -2,6 +2,7 @@ package snackscription.review.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -59,7 +60,7 @@ public class ReviewServiceTest {
 
 
     @Test
-    public void testGetSubsboxReview() throws Exception {
+    public void testGetSubsboxReview() throws Exception {    
         String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
         List<Review> curReviews = new ArrayList<>();
         for (Review review : this.reviews) {            
@@ -69,7 +70,6 @@ public class ReviewServiceTest {
         }
 
         when(reviewRepo.findByIdSubsbox(subscriptionBoxId)).thenReturn(curReviews);
-        when(reviewRepo.findByIdSubsbox(subscriptionBoxId)).thenReturn(curReviews);
 
         List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, null);        
 
@@ -78,7 +78,7 @@ public class ReviewServiceTest {
         verify(reviewRepo).findByIdSubsbox(subscriptionBoxId);
     }
 
-    @Test
+    @Test    
     public void testGetSubsboxReviewNotFound() throws Exception {
         String subscriptionBoxId = "nonexistent_subsbox_id";
 
@@ -87,13 +87,13 @@ public class ReviewServiceTest {
         List<Review> foundReviews = reviewService.getSubsboxReview(subscriptionBoxId, null);
 
         assertNotNull(foundReviews);
-        assertEquals(0, foundReviews.size());
+        assertEquals(0, foundReviews.size());       
 
         verify(reviewRepo).findByIdSubsbox(subscriptionBoxId);
     }
 
     @Test
-    public void testGetSubsboxReviewApproved() throws Exception {
+    public void testGetSubsboxReviewApproved() throws Exception {    
         String subscriptionBoxId = this.reviews.getFirst().getSubsbox();
 
         List <Review> cuReviews = new ArrayList<>();
